@@ -13,6 +13,7 @@ const eventRoutes = require("./api/routes/event-routes");
 const blogRoutes = require("./api/routes/blog-routes");
 
 // const PORT = 4000;
+
 const PORT = 4000; // For NAS
 const URL = "mongodb://localhost:27017/restaurants_db";
 // const URL = "mongodb://192.168.31.198:27017/restaurants_db"; // NAS Database
