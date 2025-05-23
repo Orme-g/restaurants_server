@@ -21,7 +21,7 @@ router.patch("/restaurants/:id", updateRestaurant);
 router.get("/sorted-restaurants/:sort", getSortedRestaurants);
 router.post("/find-restaurant/selection", findRestaurant);
 router.get("/find-restaurant/selection", findRestaurant);
-router.get("/pairs", getRestNamesAndIds);
+router.get("/pairs/:userId", getRestNamesAndIds);
 router.get("/search-restaurant/:input", searchRestaurant);
 
 module.exports = router;

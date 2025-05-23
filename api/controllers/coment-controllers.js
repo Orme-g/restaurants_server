@@ -22,7 +22,7 @@ const postComment = (req, res) => {
     try {
         const comment = new Comment(req.body);
         const { userId } = req.body;
-        User.findByIdAndUpdate(userId1, {
+        User.findByIdAndUpdate(userId, {
             $inc: { comments: 1 },
         }).then(() => {
             comment

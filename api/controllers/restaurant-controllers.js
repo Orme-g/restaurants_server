@@ -1,4 +1,5 @@
 const Restaurant = require("../models/restaurant");
+const User = require("../models/user");
 
 const handleError = (res, error) => {
     res.status(500).json({ error });
@@ -96,14 +97,30 @@ const findRestaurant = (req, res) => {
 };
 
 const getRestNamesAndIds = (req, res) => {
-    Restaurant.find()
-        .then((result) =>
-            result.map((rest) => {
-                return { name: rest.name, id: rest._id };
-            })
-        )
-        .then((result) => res.status(200).json(result))
-        .catch((e) => res.status(500).json("Server error :("));
+    const userId = req.params.userId;
+    User.findById(userId)
+        .then((result) => {
+            let restPairs = [];
+            if (result.favouriteRestaurants.length > 0) {
+                result.favouriteRestaurants.forEach((item) => {
+                    Restaurant.findById(item).then((result) => {
+                        restPairs.push([result.name, result._id]);
+                        // console.log(restPairs);
+                    });
+                });
+            }
+            return restPairs;
+        })
+        .then((result) => console.log(result));
+    // .then(() => res.status(200).json(restPairs));
+    // Restaurant.find()
+    //     .then((result) =>
+    //         result.map((rest) => {
+    //             return { name: rest.name, id: rest._id };
+    //         })
+    //     )
+    //     .then((result) => res.status(200).json(result))
+    //     .catch((e) => res.status(500).json("Server error :("));
 };
 
 const searchRestaurant = (req, res) => {
