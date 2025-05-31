@@ -22,9 +22,9 @@ const URL = "mongodb://192.168.31.198:27017/restaurants_db"; // NAS Database
 const app = express();
 app.use(
     cors({
-        // origin: "https://weats.ru", // Web Server
+        origin: ["https://weats.ru", "http://weats.ru"], // Web Server
         // origin: "https://192.168.31.198:7000", // For NAS
-        origin: "http://localhost:5173", // Local development server
+        // origin: "http://localhost:5173", // Local development server
         // origin: "http://localhost:4173", // Local production server
         // methods: ["GET", "POST"]       // Какие запросы разрешены
     })
@@ -41,22 +41,22 @@ app.use(userRoutes);
 app.use(eventRoutes);
 app.use(blogRoutes);
 
-const sslServer = https.createServer(
-    {
-        key: fs.readFileSync(path.join(__dirname, "certificate", "key.pem")),
-        cert: fs.readFileSync(path.join(__dirname, "certificate", "certificate.pem")),
-    },
-    app
-);
+// const sslServer = https.createServer(
+//     {
+//         key: fs.readFileSync(path.join(__dirname, "certificate", "key.pem")),
+//         cert: fs.readFileSync(path.join(__dirname, "certificate", "certificate.pem")),
+//     },
+//     app
+// );
 
 mongoose
     .connect(URL)
     .then(() => console.log("Connected to MongoDB"))
     .catch((err) => console.log(`DB connection failed: ${err}`));
 
-sslServer.listen(PORT, (err) => {
-    err ? console.log(err) : console.log(`Secure server listening port ${PORT}`);
-});
-// app.listen(PORT, (err) => {
-//     err ? console.log(err) : console.log(`Listening port ${PORT}`);
+// sslServer.listen(PORT, (err) => {
+//     err ? console.log(err) : console.log(`Secure server listening port ${PORT}`);
 // });
+app.listen(PORT, (err) => {
+    err ? console.log(err) : console.log(`Listening port ${PORT}`);
+});
