@@ -22,7 +22,7 @@ const restaurantSchema = new Schema({
             required: true,
         },
     ],
-    cousines: [
+    cousine: [
         {
             type: String,
             required: true,
@@ -30,14 +30,6 @@ const restaurantSchema = new Schema({
         },
     ],
     rating: [Number],
-    // {
-    // marks: { type: Number, required: true, default: 0 },
-    // overallRating: { type: Number, required: true, default: 0 },
-
-    // type: Number,
-    // required: true,
-    // default: 4,
-    // }
     adress: {
         type: String,
         required: true,
@@ -59,6 +51,7 @@ const restaurantSchema = new Schema({
         type: String,
         required: true,
     },
+    coordinates: { type: String, required: true },
     subway: [{ type: String }],
     events: [String],
 });

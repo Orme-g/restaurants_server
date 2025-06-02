@@ -16,11 +16,21 @@ const getRestaurants = (req, res) => {
 };
 
 const getRestaurantById = (req, res) => {
-    Restaurant.findById(req.params.id)
-        .then((restaurants) => {
-            res.status(200).json(restaurants);
-        })
-        .catch((err) => handleError(res, err));
+    try {
+        Restaurant.findById(req.params.id)
+            .then((restaurants) => {
+                res.status(200).json(restaurants);
+            })
+            // .catch((err) => handleError(res, err));
+            .catch(() => res.status(404));
+    } catch (e) {
+        handleError(res, e);
+    }
+    // Restaurant.findById(req.params.id)
+    //     .then((restaurants) => {
+    //         res.status(200).json(restaurants);
+    //     })
+    //     .catch((err) => handleError(res, err));
 };
 
 const deleteRestaurant = (req, res) => {
