@@ -50,7 +50,6 @@ const postComment = (req, res) => {
 const deleteComment = (req, res) => {
     try {
         const { id, reason } = req.body;
-        // Comment.findByIdAndDelete(req.params.id)
         Comment.findByIdAndUpdate(id, { $set: { text: reason, deleted: true } })
             .then(() => {
                 res.status(200).json({ message: "Комментарий успешно удалён" });
@@ -61,32 +60,15 @@ const deleteComment = (req, res) => {
     }
 };
 
-const likeComment = (req, res) => {
+const commentEvaluation = (req, res) => {
     try {
-        Comment.findByIdAndUpdate(req.params.id, { $inc: { likes: 1 } })
-            .then(() => res.status(200).json("Liked"))
-            .catch((err) => handleError(res, err));
-    } catch (e) {
-        handleError(res, e);
-    }
-};
-
-const dislikeComment = (req, res) => {
-    try {
-        Comment.findByIdAndUpdate(req.params.id, { $inc: { dislikes: 1 } })
-            .then((result) => res.status(200).json(result))
-            .catch((err) => handleError(res, err));
-    } catch (e) {
-        handleError(res, e);
-    }
-};
-const evaluateComment = (req, res) => {
-    try {
-        const { type, id: commentId, userId } = req.body;
+        const { id: commentId, userId, type } = req.body;
         switch (type) {
             case "like":
                 Comment.findByIdAndUpdate(commentId, { $inc: { likes: 1 } })
-                    .then(() => {})
+                    .then(() => {
+                        res.status(200).json({ message: "Liked" });
+                    })
                     .catch((e) => handleError(res, e));
                 User.findByIdAndUpdate(userId, {
                     $addToSet: { ratedComments: commentId },
@@ -96,7 +78,11 @@ const evaluateComment = (req, res) => {
                     .catch((e) => handleError(res, e));
                 break;
             case "dislike":
-                Comment.findByIdAndUpdate(commentId, { $inc: { dislikes: 1 } }).then(() => {});
+                Comment.findByIdAndUpdate(commentId, { $inc: { dislikes: 1 } })
+                    .then(() => {
+                        res.status(200).json({ message: "Disliked" });
+                    })
+                    .catch((e) => handleError(res, e));
                 User.findByIdAndUpdate(userId, {
                     $addToSet: { ratedComments: commentId },
                     $inc: { rating: -1 },
@@ -111,13 +97,10 @@ const evaluateComment = (req, res) => {
         handleError(res, err);
     }
 };
-
 module.exports = {
     getCommentsForTopic,
     getSingleCommentData,
     postComment,
     deleteComment,
-    likeComment,
-    dislikeComment,
-    evaluateComment,
+    commentEvaluation,
 };

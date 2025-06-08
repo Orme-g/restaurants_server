@@ -5,9 +5,7 @@ const {
     getSingleCommentData,
     postComment,
     deleteComment,
-    likeComment,
-    dislikeComment,
-    evaluateComment,
+    commentEvaluation,
 } = require("../controllers/coment-controllers");
 
 const router = express.Router();
@@ -15,9 +13,7 @@ const router = express.Router();
 router.get("/comments/:topic", getCommentsForTopic);
 router.get("/comments/single-comment/:commentId", getSingleCommentData);
 router.post("/comments", postComment);
-router.patch("/comments/:id", deleteComment);
-router.patch("/comments/like/:id", likeComment);
-router.patch("/comments/dislike/:id", dislikeComment);
-router.patch("/comments/evaluate", evaluateComment);
+router.patch("/comments/delete-comment", deleteComment);
+router.patch("/comments/evaluate-comment", commentEvaluation);
 
 module.exports = router;
