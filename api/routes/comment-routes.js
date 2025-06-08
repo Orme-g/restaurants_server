@@ -2,6 +2,7 @@ const express = require("express");
 
 const {
     getCommentsForTopic,
+    getSingleCommentData,
     postComment,
     deleteComment,
     likeComment,
@@ -11,11 +12,12 @@ const {
 
 const router = express.Router();
 
-router.get("/best-doner/comments/:topic", getCommentsForTopic);
-router.post("/best-doner/comments", postComment);
-router.delete("/best-doner/comments/:id", deleteComment);
-router.patch("/best-doner/comments/like/:id", likeComment);
-router.patch("/best-doner/comments/dislike/:id", dislikeComment);
-router.patch("/best-doner/comments/evaluate", evaluateComment);
+router.get("/comments/:topic", getCommentsForTopic);
+router.get("/comments/single-comment/:commentId", getSingleCommentData);
+router.post("/comments", postComment);
+router.patch("/comments/:id", deleteComment);
+router.patch("/comments/like/:id", likeComment);
+router.patch("/comments/dislike/:id", dislikeComment);
+router.patch("/comments/evaluate", evaluateComment);
 
 module.exports = router;

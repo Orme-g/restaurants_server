@@ -26,11 +26,6 @@ const getRestaurantById = (req, res) => {
     } catch (e) {
         handleError(res, e);
     }
-    // Restaurant.findById(req.params.id)
-    //     .then((restaurants) => {
-    //         res.status(200).json(restaurants);
-    //     })
-    //     .catch((err) => handleError(res, err));
 };
 
 const deleteRestaurant = (req, res) => {
@@ -90,10 +85,7 @@ const getSortedRestaurants = (req, res) => {
 const findRestaurant = (req, res) => {
     const { subway, cousine, sortBy } = req.body;
     const sort = sortBy === "expensive" ? -1 : 1;
-    // const subway = "Старая Деревня";
-    // const cousine = ["Французская", "Японская", "Итальянская"];
     Restaurant.find({ cousine: { $in: cousine }, subway: { $in: [subway] } })
-        // Restaurant.find({ cousine: { $in: cousine } })
         .sort({ bill: sort })
         .then((restaurants) => {
             if (restaurants.length > 0) {
@@ -102,7 +94,6 @@ const findRestaurant = (req, res) => {
                 return res.status(200).json(null);
             }
         })
-        // .then((restaurants) => res.status(200).json(restaurants))
         .catch((err) => handleError(res, err));
 };
 
@@ -122,15 +113,6 @@ const getRestNamesAndIds = (req, res) => {
             return restPairs;
         })
         .then((result) => console.log(result));
-    // .then(() => res.status(200).json(restPairs));
-    // Restaurant.find()
-    //     .then((result) =>
-    //         result.map((rest) => {
-    //             return { name: rest.name, id: rest._id };
-    //         })
-    //     )
-    //     .then((result) => res.status(200).json(result))
-    //     .catch((e) => res.status(500).json("Server error :("));
 };
 
 const searchRestaurant = (req, res) => {

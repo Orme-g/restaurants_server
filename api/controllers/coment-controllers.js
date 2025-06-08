@@ -17,6 +17,16 @@ const getCommentsForTopic = (req, res) => {
         handleError(res, e);
     }
 };
+const getSingleCommentData = (req, res) => {
+    try {
+        const id = req.params.commentId;
+        Comment.findById(id)
+            .then((commentData) => res.status(200).json(commentData))
+            .catch(() => res.status(500));
+    } catch (e) {
+        handleError(res, e);
+    }
+};
 
 const postComment = (req, res) => {
     try {
@@ -32,18 +42,6 @@ const postComment = (req, res) => {
                 })
                 .catch((err) => handleError(res, err));
         });
-
-        // comment
-        //     .save()
-        //     .then(() => {
-        //         res.status(201).json({ message: "success" });
-        //     })
-        //     .catch((err) => handleError(res, err));
-        // User.findByIdAndUpdate(userId, {
-        //     $inc: { comments: 1 },
-        // })
-        //     .then(() => res.status(200).json({ message: "success" }))
-        //     .catch((error) => handleError(res, error));
     } catch (e) {
         handleError(res, e);
     }
@@ -51,11 +49,13 @@ const postComment = (req, res) => {
 
 const deleteComment = (req, res) => {
     try {
-        Comment.findByIdAndDelete(req.params.id)
-            .then((result) => {
-                res.status(200).json(result);
+        const { id, reason } = req.body;
+        // Comment.findByIdAndDelete(req.params.id)
+        Comment.findByIdAndUpdate(id, { $set: { text: reason, deleted: true } })
+            .then(() => {
+                res.status(200).json({ message: "Комментарий успешно удалён" });
             })
-            .catch((err) => handleError(res, err));
+            .catch(() => res.status(500).json("Что-то пошло не так..."));
     } catch (e) {
         handleError(res, e);
     }
@@ -114,6 +114,7 @@ const evaluateComment = (req, res) => {
 
 module.exports = {
     getCommentsForTopic,
+    getSingleCommentData,
     postComment,
     deleteComment,
     likeComment,

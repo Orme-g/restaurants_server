@@ -139,7 +139,7 @@ const changeAvatar = async (req, res) => {
         const { userId, avatarData } = req.body;
         User.findByIdAndUpdate(userId, { $set: { avatar: avatarData } })
             .then(() => res.status(200).json("Аватар успешно изменён"))
-            .catch((err) => res.status(500).json({ err }));
+            .catch((err) => res.status(500).json("Что-то пошло не так..."));
     } catch (error) {
         handleError(res, error);
     }
@@ -167,11 +167,11 @@ const addReviewedRestaurant = (req, res) => {
 
 const handleFavouriteRestaurant = (req, res) => {
     try {
-        const { userId, restId, type } = req.body;
+        const { userId, restId, type, name } = req.body;
         switch (type) {
             case "add":
                 User.findByIdAndUpdate(userId, {
-                    $addToSet: { favouriteRestaurants: restId },
+                    $addToSet: { favouriteRestaurants: [name, restId] },
                 })
                     .then(() =>
                         res.status(200).json({ message: "Добавлен в избранное", type: "success" })
@@ -179,7 +179,9 @@ const handleFavouriteRestaurant = (req, res) => {
                     .catch((error) => handleError(res, error));
                 break;
             case "remove":
-                User.findByIdAndUpdate(userId, { $pull: { favouriteRestaurants: restId } })
+                User.findByIdAndUpdate(userId, {
+                    $pull: { favouriteRestaurants: { $elemMatch: { $eq: restId } } },
+                })
                     .then(() =>
                         res.status(200).json({ message: "Убран из избранного", type: "warning" })
                     )

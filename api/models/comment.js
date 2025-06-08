@@ -9,22 +9,16 @@ const commentSchema = new Schema({
     },
     userId: String,
     topic: String,
-
     likes: Number,
-
     dislikes: Number,
-
     text: String,
-
-    reply: {
-        name: String,
-        text: String,
-    },
+    replyToComment: String,
     createdAt: {
         type: Date,
         default: () => Date.now(),
         immutable: true,
     },
+    deleted: Boolean,
 });
 
 const Comment = mongoose.model("Comment", commentSchema);

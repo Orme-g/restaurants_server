@@ -14,17 +14,18 @@ const userRoutes = require("./api/routes/user-routes");
 const eventRoutes = require("./api/routes/event-routes");
 const blogRoutes = require("./api/routes/blog-routes");
 
-const PORT = 4000;
-// const PORT = 5500; // For NAS
-// const URL = "mongodb://localhost:27017/restaurants_db";
+// const PORT = 4000; // For Local development
+const PORT = 5500; // For NAS
+
+// const URL = "mongodb://localhost:27017/restaurants_db";  // Local database
 const URL = "mongodb://192.168.31.198:27017/restaurants_db"; // NAS Database
 
 const app = express();
 app.use(
     cors({
-        // origin: ["https://weats.ru", "http://weats.ru"], // Web Server
+        origin: ["https://weats.ru", "http://weats.ru"], // Web Server
         // origin: "https://192.168.31.198:7000", // For NAS
-        origin: "http://localhost:5173", // Local development server
+        // origin: "http://localhost:5173", // Local development server
         // origin: "http://localhost:4173", // Local production server
         // methods: ["GET", "POST"]       // Какие запросы разрешены
     })
@@ -40,7 +41,7 @@ app.use(userRoutes);
 app.use(eventRoutes);
 app.use(blogRoutes);
 
-//HTTPS Server
+// To use HTTPS Protocol on Server
 // const sslServer = https.createServer(
 //     {
 //         key: fs.readFileSync(path.join(__dirname, "certificate", "key.pem")),
@@ -57,7 +58,7 @@ mongoose
 app.listen(PORT, (err) => {
     err ? console.log(err) : console.log(`Listening port ${PORT}`);
 });
-// HTTPS Server
+// To use HTTPS Protocol on Server
 // sslServer.listen(PORT, (err) => {
 //     err ? console.log(err) : console.log(`Secure server listening port ${PORT}`);
 // });
