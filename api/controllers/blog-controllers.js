@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const BlogPost = require("../models/blogPost");
 const User = require("../models/user");
 
@@ -19,20 +20,16 @@ const getPostData = (req, res) => {
 const getSortedPosts = (req, res) => {
     try {
         const { type } = req.params;
-        if (type === "top") {
-            BlogPost.find()
-                .sort({ likes: -1 })
-                .limit(4)
-                .then((result) => res.status(200).json(result))
-                .catch((error) => handleError(res, error));
+        const { number } = req.query;
+        if (type !== "top" && type !== "last") {
+            return res.status(401).json("Invalid type provided");
         }
-        if (type === "last") {
-            BlogPost.find()
-                .sort({ createdAt: -1 })
-                .limit(9)
-                .then((result) => res.status(200).json(result))
-                .catch((error) => handleError(res, error));
-        }
+        const sortByType = type === "top" ? { likes: -1 } : { createdAt: -1 };
+        BlogPost.find()
+            .sort(sortByType)
+            .limit(+number)
+            .then((result) => res.status(200).json(result))
+            .catch((error) => handleError(res, error));
     } catch (e) {
         res.status(500).json(e);
     }
@@ -55,10 +52,7 @@ const getDataForBadge = (req, res) => {
     try {
         const { userId } = req.params;
         User.findById(userId)
-            .then((result) => {
-                return result.blogData;
-            })
-            .then((data) => res.status(200).json(data))
+            .then(({ blogData }) => res.status(200).json(blogData))
             .catch((error) => handleError(res, error));
     } catch (e) {
         handleError(res, e);
@@ -87,34 +81,32 @@ const getPostsByTheme = (req, res) => {
     }
 };
 
-const updateLikesOrCommentsCount = (req, res) => {
+const updateLikesOrCommentsCount = async (req, res) => {
+    const session = await mongoose.startSession();
     try {
         const { postId, field, userId } = req.body;
-        switch (field) {
-            case "likes":
-                BlogPost.findByIdAndUpdate(postId, { $inc: { likes: 1 } })
-                    .then(() => {})
-                    .catch((error) => handleError(res, error));
-                User.findByIdAndUpdate(userId, { $addToSet: { ratedBlogPosts: postId } })
-                    .then((result) => res.status(200).json(result))
-                    .catch((error) => handleError(res, error));
-                break;
-            default:
-        }
+
+        await session.withTransaction(async () => {
+            if (field === "like") {
+                await BlogPost.findByIdAndUpdate(postId, { $inc: { likes: 1 } }, { session });
+                await User.findByIdAndUpdate(
+                    userId,
+                    { $addToSet: { ratedBlogPosts: postId } },
+                    { session }
+                );
+            }
+        });
+        res.status(200).json("You liked the post!");
     } catch (error) {
         handleError(res, error);
+    } finally {
+        await session.endSession();
     }
-};
-
-const getAllPosts = (req, res) => {
-    // BlogPost.find().then((result) => res.status(200).json(result));
-    // return res.status(200).json("All ok");
 };
 
 module.exports = {
     getPostData,
     getSortedPosts,
-    getAllPosts,
     getTopAuthors,
     getDataForBadge,
     getUserPosts,

@@ -29,22 +29,29 @@ const getSingleCommentData = (req, res) => {
     }
 };
 
-const postComment = (req, res) => {
+const postComment = async (req, res) => {
+    const session = await mongoose.startSession();
     try {
         const comment = new Comment(req.body);
         const { userId } = req.body;
-        User.findByIdAndUpdate(userId, {
-            $inc: { comments: 1 },
-        }).then(() => {
-            comment
-                .save()
-                .then(() => {
-                    res.status(201).json({ message: "success" });
-                })
-                .catch((err) => handleError(res, err));
+        if (!userId) {
+            return res.status(400).json("User id not provided!");
+        }
+        await session.withTransaction(async () => {
+            await comment.save({ session });
+            await User.findByIdAndUpdate(
+                userId,
+                {
+                    $inc: { comments: 1 },
+                },
+                { session }
+            );
         });
+        res.status(201).json({ message: "Комментарий успешно добавлен" });
     } catch (e) {
-        handleError(res, e);
+        res.status(500).json("Комментарий не добавлен. Что-то пошло не так...");
+    } finally {
+        await session.endSession();
     }
 };
 
@@ -65,11 +72,16 @@ const commentEvaluation = async (req, res) => {
     const session = await mongoose.startSession();
     try {
         const { id: commentId, userId, type } = req.body;
-        let testId = "123";
         if (type !== "like" && type !== "dislike") {
             return res.status(400).json("Invalid type provided");
         }
         await session.withTransaction(async () => {
+            // Если хотим внутри транзакции вернуть ошибку, то только
+            // через throw new Error('Error text'), если мы будем использовать
+            // res.status(500).json("Error"), то это не откатит транзакцию, так как не будет
+            // считаться за ошибку, а будет намеренным ответом
+            // Comment.findByIdAndUpdate({}).catch() - нельзя, так как мы перехватим ошибку раньше транзакции
+            // и она может повести себя неправильно
             const commentUpdateType =
                 type === "like" ? { $inc: { likes: 1 } } : { $inc: { dislikes: 1 } };
             const updateUserRating = type === "like" ? 1 : -1;
@@ -84,6 +96,7 @@ const commentEvaluation = async (req, res) => {
                 { session }
             );
         });
+        // Ответы res.status().json() только вне тела транзакций, чтобы не нарушать логику работы транзакций
         res.status(200).json(type === "liked" ? "Liked" : "Disliked");
     } catch (err) {
         handleError(res, err);
@@ -92,43 +105,6 @@ const commentEvaluation = async (req, res) => {
     }
 };
 
-// Without Transactions
-// const __commentEvaluation = (req, res) => {
-//     try {
-//         const { id: commentId, userId, type } = req.body;
-
-//         switch (type) {
-//             case "like":
-//                 Comment.findByIdAndUpdate(commentId, { $inc: { likes: 1 } })
-//                 .catch((e) =>
-//                     handleError(res, e)
-//                 );
-//                 User.findByIdAndUpdate(userId, {
-//                     $addToSet: { ratedComments: commentId },
-//                     $inc: { rating: 1 },
-//                 })
-//                     .then((result) => res.status(200).json(result))
-//                     .catch((e) => handleError(res, e));
-//                 break;
-//             case "dislike":
-//                 Comment.findByIdAndUpdate(commentId, { $inc: { dislikes: 1 } }).catch((e) =>
-//                     handleError(res, e)
-//                 );
-//                 User.findByIdAndUpdate(userId, {
-//                     $addToSet: { ratedComments: commentId },
-//                     $inc: { rating: -1 },
-//                 })
-//                     .then((result) => res.status(200).json(result))
-//                     .catch((e) => handleError(res, e));
-//                 break;
-//             default:
-//                 return;
-//         }
-//     } catch (err) {
-//         handleError(res, err);
-//     }
-// };
-
 module.exports = {
     getCommentsForTopic,
     getSingleCommentData,
@@ -136,51 +112,3 @@ module.exports = {
     deleteComment,
     commentEvaluation,
 };
-
-// const commentEvaluation = async (req, res) => {
-//     const session = await mongoose.startSession();
-//     try {
-//         const { id: commentId, userId, type } = req.body;
-//         if(type !== 'like' || type !== 'dislike') {
-//             return res.status(400).json('Invalid type provided')
-//         }
-//         await session.withTransaction(async () => {
-//             const commentUpdateType = type === 'like' ? { $inc: { likes: 1 } } : { $inc: { dislikes: 1 } }
-//             const updateUserRating = type === 'like' ? 1 : -1
-//             switch (type) {
-//                 case "like":
-//                     await Comment.findByIdAndUpdate(commentId, { $inc: { likes: 1 } }, { session });
-//                     await User.findByIdAndUpdate(
-//                         userId,
-//                         {
-//                             $addToSet: { ratedComments: commentId },
-//                             $inc: { rating: 1 },
-//                         },
-//                         { session }
-//                     );
-//                     res.status(200).json("Liked");
-//                     break;
-//                 case "dislike":
-//                     await Comment.findByIdAndUpdate(
-//                         commentId,
-//                         { $inc: { dislikes: 1 } },
-//                         { session }
-//                     );
-//                     await User.findByIdAndUpdate(
-//                         userId,
-//                         {
-//                             $addToSet: { ratedComments: commentId },
-//                             $inc: { rating: -1 },
-//                         },
-//                         { session }
-//                     );
-//                     res.status(200).json("Disliked");
-//                     break;
-//             }
-//         });
-//     } catch (err) {
-//         handleError(res, err);
-//     } finally {
-//        await session.endSession();
-//     }
-// };
