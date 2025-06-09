@@ -5,20 +5,29 @@ const handleError = (res, error) => {
 };
 
 const getAllDoners = (req, res) => {
-    Doner.find()
-        .sort({ createdAt: -1 })
-        .then((restaurants) => {
-            res.status(200).json(restaurants);
-        })
-        .catch((err) => handleError(res, err));
+    try {
+        Doner.find()
+            .sort({ createdAt: -1 })
+            .then((restaurants) => {
+                res.status(200).json(restaurants);
+            })
+            .catch((err) => handleError(res, err));
+    } catch (e) {
+        handleError(res, e);
+    }
 };
 
 const getDonerById = (req, res) => {
-    Doner.findById(req.params.id)
-        .then((restaurants) => {
-            res.status(200).json(restaurants);
-        })
-        .catch((err) => handleError(res, err));
+    try {
+        const { id } = req.params;
+        Doner.findById(id)
+            .then((restaurants) => {
+                res.status(200).json(restaurants);
+            })
+            .catch((err) => handleError(res, err));
+    } catch (e) {
+        handleError(res, e);
+    }
 };
 
 const addDonerArticle = (req, res) => {

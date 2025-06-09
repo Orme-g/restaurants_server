@@ -6,39 +6,48 @@ const handleError = (res, error) => {
 };
 
 const getRestaurants = (req, res) => {
-    Restaurant.find()
-        .sort({ createdAt: -1 })
-        .limit(6)
-        .then((restaurants) => {
-            res.status(200).json(restaurants);
-        })
-        .catch((err) => handleError(res, err));
+    try {
+        Restaurant.find()
+            .sort({ createdAt: -1 })
+            .limit(6)
+            .then((restaurants) => {
+                res.status(200).json(restaurants);
+            })
+            .catch((err) => handleError(res, err));
+    } catch (e) {
+        handleError(res, e);
+    }
 };
 
 const getRestaurantById = (req, res) => {
     try {
-        Restaurant.findById(req.params.id)
+        const { id } = req.params;
+        Restaurant.findById(id)
             .then((restaurants) => {
                 res.status(200).json(restaurants);
             })
-            // .catch((err) => handleError(res, err));
             .catch(() => res.status(404));
     } catch (e) {
         handleError(res, e);
     }
 };
 
-const deleteRestaurant = (req, res) => {
-    Restaurant.findByIdAndDelete(req.params.id)
-        .then((result) => {
-            res.status(200).json(result);
-        })
-        .catch((err) => handleError(res, err));
-};
+// const deleteRestaurant = (req, res) => {
+//     try {
+//         const { id } = req.params;
+//         Restaurant.findByIdAndDelete(id)
+//             .then((result) => {
+//                 res.status(200).json(result);
+//             })
+//             .catch((err) => handleError(res, err));
+//     } catch (e) {
+//         handleError(res, e);
+//     }
+// };
 
 const addRestaurant = (req, res) => {
     try {
-        const restaurant = new Restaurant(req.body); // Добавляем новый элемент который берем из тела запроса
+        const restaurant = new Restaurant(req.body);
         restaurant
             .save()
             .then(() => {
@@ -50,36 +59,40 @@ const addRestaurant = (req, res) => {
     }
 };
 
-const updateRestaurant = (req, res) => {
-    Restaurant.findByIdAndUpdate(req.params.id, req.body) // (id документа, новые данные)
-        .then((result) => {
-            res.status(200).json(result);
-        })
-        .catch((err) => handleError(res, err));
-};
+// const updateRestaurant = (req, res) => {
+//     try {
+//         Restaurant.findByIdAndUpdate(req.params.id, req.body) // (id документа, новые данные)
+//             .then((result) => {
+//                 res.status(200).json(result);
+//             })
+//             .catch((err) => handleError(res, err));
+//     } catch (e) {
+//         handleError(res, e);
+//     }
+// };
 
 const getSortedRestaurants = (req, res) => {
-    let sortType;
-    switch (req.params.sort) {
-        case "expensive":
-            sortType = { bill: -1 };
-            break;
-        case "cheap":
-            sortType = { bill: 1 };
-            break;
-        case "best":
-            sortType = { rating: -1 };
-            break;
-        default:
-            sortType = null;
+    try {
+        const { sort } = req.params;
+        const { cardsNumber } = req.query;
+        const getSortedBy =
+            sort === "expensive"
+                ? { bill: -1 }
+                : sort === "cheap"
+                ? { bill: 1 }
+                : sort === "best"
+                ? { rating: -1 }
+                : null;
+        Restaurant.find()
+            .sort(getSortedBy)
+            .limit(cardsNumber)
+            .then((restaurants) => {
+                res.status(200).json(restaurants);
+            })
+            .catch((err) => handleError(res, err));
+    } catch (e) {
+        handleError(res, e);
     }
-    Restaurant.find()
-        .sort(sortType)
-        .limit(10)
-        .then((restaurants) => {
-            res.status(200).json(restaurants);
-        })
-        .catch((err) => handleError(res, err));
 };
 
 const findRestaurant = (req, res) => {
@@ -132,9 +145,9 @@ const searchRestaurant = (req, res) => {
 module.exports = {
     getRestaurants,
     getRestaurantById,
-    deleteRestaurant,
+    // deleteRestaurant,
     addRestaurant,
-    updateRestaurant,
+    // updateRestaurant,
     getSortedRestaurants,
     findRestaurant,
     getRestNamesAndIds,

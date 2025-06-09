@@ -5,18 +5,26 @@ const handleError = (res, error) => {
 };
 
 const getEvent = (req, res) => {
-    const eventId = req.params.id;
-    Event.findById(eventId)
-        .then((event) => res.status(200).json(event))
-        .catch((error) => handleError(res, error));
+    try {
+        const { id: eventId } = req.params;
+        Event.findById(eventId)
+            .then((event) => res.status(200).json(event))
+            .catch((error) => handleError(res, error));
+    } catch (e) {
+        handleError(res, e);
+    }
 };
 
 const getRestaurantEvents = (req, res) => {
-    const restaurantId = req.params.id;
-    Event.find({ restaurantId })
-        .sort({ createdAt: -1 })
-        .then((result) => res.status(200).json(result))
-        .catch((error) => handleError(res, error));
+    try {
+        const { id: restaurantId } = req.params;
+        Event.find({ restaurantId })
+            .sort({ createdAt: -1 })
+            .then((result) => res.status(200).json(result))
+            .catch((error) => handleError(res, error));
+    } catch (e) {
+        handleError(res, e);
+    }
 };
 
 const addNewEvent = (req, res) => {
