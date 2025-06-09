@@ -15,10 +15,11 @@ const eventRoutes = require("./api/routes/event-routes");
 const blogRoutes = require("./api/routes/blog-routes");
 
 const PORT = 4000; // For Local development
-// const PORT = 5500; // For NAS
+// const PORT = 5500; // For NAS/Web
 
 // const URL = "mongodb://localhost:27017/restaurants_db";  // Local database
-const URL = "mongodb://192.168.31.198:27017/restaurants_db"; // NAS Database
+// const URL = "mongodb://192.168.31.198:27017/restaurants_db"; // NAS Database
+const URL = "mongodb://192.168.31.198:27017/restaurants_db?replicaSet=replicaset"; // Database with replica set
 
 const app = express();
 app.use(
