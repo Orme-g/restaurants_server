@@ -3,7 +3,7 @@ const express = require("express");
 const {
     registration,
     login,
-    getUsers,
+    // getUsers,
     getUserData,
     changePassword,
     getReviewedRestaurantsList,
@@ -19,7 +19,7 @@ const router = express.Router();
 
 router.post("/register", registration);
 router.post("/login", login);
-router.get("/users", getUsers);
+// router.get("/users", getUsers);
 router.get("/user/getdata/:userId", getUserData);
 router.patch("/profile", changePassword);
 router.get("/reviewedRestaurants/:userId", getReviewedRestaurantsList);

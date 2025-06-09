@@ -1,5 +1,5 @@
 const Restaurant = require("../models/restaurant");
-const User = require("../models/user");
+// const User = require("../models/user");
 
 const handleError = (res, error) => {
     res.status(500).json({ error });
@@ -96,37 +96,45 @@ const getSortedRestaurants = (req, res) => {
 };
 
 const findRestaurant = (req, res) => {
-    const { subway, cousine, sortBy } = req.body;
-    const sort = sortBy === "expensive" ? -1 : 1;
-    Restaurant.find({ cousine: { $in: cousine }, subway: { $in: [subway] } })
-        .sort({ bill: sort })
-        .then((restaurants) => {
-            if (restaurants.length > 0) {
-                return res.status(200).json(restaurants);
-            } else {
-                return res.status(200).json(null);
-            }
-        })
-        .catch((err) => handleError(res, err));
+    try {
+        const { subway, cousine, sortBy } = req.body;
+        const sort = sortBy === "expensive" ? -1 : 1;
+        Restaurant.find({ cousine: { $in: cousine }, subway: { $in: [subway] } })
+            .sort({ bill: sort })
+            .then((restaurants) => {
+                if (restaurants.length > 0) {
+                    return res.status(200).json(restaurants);
+                } else {
+                    return res.status(200).json(null);
+                }
+            })
+            .catch((err) => handleError(res, err));
+    } catch (e) {
+        handleError(res, e);
+    }
 };
 
-const getRestNamesAndIds = (req, res) => {
-    const userId = req.params.userId;
-    User.findById(userId)
-        .then((result) => {
-            let restPairs = [];
-            if (result.favouriteRestaurants.length > 0) {
-                result.favouriteRestaurants.forEach((item) => {
-                    Restaurant.findById(item).then((result) => {
-                        restPairs.push([result.name, result._id]);
-                        // console.log(restPairs);
-                    });
-                });
-            }
-            return restPairs;
-        })
-        .then((result) => console.log(result));
-};
+// const getRestNamesAndIds = (req, res) => {
+//     try {
+//         const { userId } = req.params;
+//         User.findById(userId)
+//             .then((result) => {
+//                 let restPairs = [];
+//                 if (result.favouriteRestaurants.length > 0) {
+//                     result.favouriteRestaurants.forEach((item) => {
+//                         Restaurant.findById(item).then((result) => {
+//                             restPairs.push([result.name, result._id]);
+//                             // console.log(restPairs);
+//                         });
+//                     });
+//                 }
+//                 return restPairs;
+//             })
+//             .then((result) => console.log(result));
+//     } catch (e) {
+//         handleError(res, e);
+//     }
+// };
 
 const searchRestaurant = (req, res) => {
     try {
@@ -150,6 +158,6 @@ module.exports = {
     // updateRestaurant,
     getSortedRestaurants,
     findRestaurant,
-    getRestNamesAndIds,
+    // getRestNamesAndIds,
     searchRestaurant,
 };

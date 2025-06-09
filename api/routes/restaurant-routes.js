@@ -7,7 +7,7 @@ const {
     // updateRestaurant,
     getSortedRestaurants,
     findRestaurant,
-    getRestNamesAndIds,
+    // getRestNamesAndIds,
     searchRestaurant,
 } = require("../controllers/restaurant-controllers");
 
@@ -21,7 +21,7 @@ router.post("/restaurants/add", addRestaurant);
 router.get("/sorted-restaurants/:sort", getSortedRestaurants);
 router.post("/find-restaurant/selection", findRestaurant);
 router.get("/find-restaurant/selection", findRestaurant);
-router.get("/pairs/:userId", getRestNamesAndIds);
+// router.get("/pairs/:userId", getRestNamesAndIds);
 router.get("/search-restaurant/:input", searchRestaurant);
 
 module.exports = router;

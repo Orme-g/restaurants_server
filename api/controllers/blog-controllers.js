@@ -94,6 +94,8 @@ const updateLikesOrCommentsCount = async (req, res) => {
                     { $addToSet: { ratedBlogPosts: postId } },
                     { session }
                 );
+            } else {
+                return res.status(500).json("Unknown type of action");
             }
         });
         res.status(200).json("You liked the post!");

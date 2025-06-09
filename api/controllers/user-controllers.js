@@ -14,47 +14,54 @@ const handleError = (res, error) => {
     res.status(500).json(error);
 };
 
-const getUsers = (req, res) => {
-    User.find()
-        .then((data) => {
-            res.status(200).json(data);
-        })
-        .catch((error) => handleError(res, error));
-};
+// const getUsers = (req, res) => {
+//     try {
+//         User.find()
+//             .then((data) => {
+//                 res.status(200).json(data);
+//             })
+//             .catch((error) => handleError(res, error));
+//     } catch (error) {
+//         handleError(res, error);
+//     }
+// };
 
 const getUserData = (req, res) => {
     try {
         User.findById(req.params.userId)
             .then(
                 ({
-                    avatar,
-                    name,
-                    registeredAt,
-                    username,
-                    email,
-                    comments,
-                    reviews,
-                    favouriteRestaurants,
-                    ratedComments,
-                    _id,
-                    bloger,
-                    blogData,
-                    ratedBlogPosts,
+                    password,
+                    ...data
+                    // avatar,
+                    // name,
+                    // registeredAt,
+                    // username,
+                    // email,
+                    // comments,
+                    // reviews,
+                    // favouriteRestaurants,
+                    // ratedComments,
+                    // _id,
+                    // bloger,
+                    // blogData,
+                    // ratedBlogPosts,
                 }) => {
                     res.status(200).json({
-                        avatar,
-                        name,
-                        registeredAt,
-                        username,
-                        email,
-                        comments,
-                        reviews,
-                        favouriteRestaurants,
-                        ratedComments,
-                        _id,
-                        bloger,
-                        blogData,
-                        ratedBlogPosts,
+                        data,
+                        // avatar,
+                        // name,
+                        // registeredAt,
+                        // username,
+                        // email,
+                        // comments,
+                        // reviews,
+                        // favouriteRestaurants,
+                        // ratedComments,
+                        // _id,
+                        // bloger,
+                        // blogData,
+                        // ratedBlogPosts,
                     });
                 }
             )
@@ -117,24 +124,21 @@ const login = async (req, res) => {
 const changePassword = async (req, res) => {
     try {
         const { userId, oldPass, newPass } = req.body;
-        const user = await User.findOne({ _id: userId });
-        const checkPassword = bcrypt.compareSync(oldPass, user.password);
+        const { password } = await User.findOne({ _id: userId });
+        const checkPassword = bcrypt.compareSync(oldPass, password);
         if (!checkPassword) {
-            res.status(400).json("Неверный пароль");
-        } else {
-            const hashPassword = bcrypt.hashSync(newPass, 7);
-            User.findByIdAndUpdate(userId, { $set: { password: hashPassword } })
-                .then(() => res.status(200).json("Пароль успешно изменён"))
-                .catch((err) => res.status(500).json({ err }));
+            return res.status(400).json("Неверный пароль");
         }
-
-        // res.status(200).json(user)
+        const hashPassword = bcrypt.hashSync(newPass, 7);
+        User.findByIdAndUpdate(userId, { $set: { password: hashPassword } })
+            .then(() => res.status(200).json("Пароль успешно изменён"))
+            .catch((err) => res.status(500).json({ err }));
     } catch (error) {
         handleError(res, error);
     }
 };
 
-const changeAvatar = async (req, res) => {
+const changeAvatar = (req, res) => {
     try {
         const { userId, avatarData } = req.body;
         User.findByIdAndUpdate(userId, { $set: { avatar: avatarData } })
@@ -146,9 +150,14 @@ const changeAvatar = async (req, res) => {
 };
 
 const getReviewedRestaurantsList = (req, res) => {
-    User.findById(req.params.userId)
-        .then((user) => res.status(200).json(user.reviewedRestaurants))
-        .catch((error) => handleError(res, error));
+    try {
+        const { userId } = req.params;
+        User.findById(userId)
+            .then(({ reviewedRestaurants }) => res.status(200).json(reviewedRestaurants))
+            .catch((error) => handleError(res, error));
+    } catch (error) {
+        handleError(res, error);
+    }
 };
 
 const addReviewedRestaurant = (req, res) => {
@@ -246,7 +255,7 @@ const updateSingleBlogerDataField = (req, res) => {
 };
 
 module.exports = {
-    getUsers,
+    // getUsers,
     getUserData,
     registration,
     login,
