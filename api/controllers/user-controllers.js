@@ -28,40 +28,38 @@ const handleError = (res, error) => {
 
 const getUserData = (req, res) => {
     try {
-        User.findById(req.params.userId)
+        const { userId } = req.params;
+        User.findById(userId)
             .then(
                 ({
-                    password,
-                    ...data
-                    // avatar,
-                    // name,
-                    // registeredAt,
-                    // username,
-                    // email,
-                    // comments,
-                    // reviews,
-                    // favouriteRestaurants,
-                    // ratedComments,
-                    // _id,
-                    // bloger,
-                    // blogData,
-                    // ratedBlogPosts,
+                    avatar,
+                    name,
+                    registeredAt,
+                    username,
+                    email,
+                    comments,
+                    reviews,
+                    favouriteRestaurants,
+                    ratedComments,
+                    _id,
+                    bloger,
+                    blogData,
+                    ratedBlogPosts,
                 }) => {
                     res.status(200).json({
-                        data,
-                        // avatar,
-                        // name,
-                        // registeredAt,
-                        // username,
-                        // email,
-                        // comments,
-                        // reviews,
-                        // favouriteRestaurants,
-                        // ratedComments,
-                        // _id,
-                        // bloger,
-                        // blogData,
-                        // ratedBlogPosts,
+                        avatar,
+                        name,
+                        registeredAt,
+                        username,
+                        email,
+                        comments,
+                        reviews,
+                        favouriteRestaurants,
+                        ratedComments,
+                        _id,
+                        bloger,
+                        blogData,
+                        ratedBlogPosts,
                     });
                 }
             )
