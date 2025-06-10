@@ -1,8 +1,7 @@
 const Restaurant = require("../models/restaurant");
-// const User = require("../models/user");
 
 const handleError = (res, error) => {
-    res.status(500).json({ error });
+    res.status(400).json({ error });
 };
 
 const getRestaurants = (req, res) => {
@@ -13,7 +12,7 @@ const getRestaurants = (req, res) => {
             .then((restaurants) => {
                 res.status(200).json(restaurants);
             })
-            .catch((err) => handleError(res, err));
+            .catch((e) => res.status(400));
     } catch (e) {
         handleError(res, e);
     }
@@ -26,24 +25,11 @@ const getRestaurantById = (req, res) => {
             .then((restaurants) => {
                 res.status(200).json(restaurants);
             })
-            .catch(() => res.status(404));
+            .catch((e) => res.status(404).json({ e }));
     } catch (e) {
         handleError(res, e);
     }
 };
-
-// const deleteRestaurant = (req, res) => {
-//     try {
-//         const { id } = req.params;
-//         Restaurant.findByIdAndDelete(id)
-//             .then((result) => {
-//                 res.status(200).json(result);
-//             })
-//             .catch((err) => handleError(res, err));
-//     } catch (e) {
-//         handleError(res, e);
-//     }
-// };
 
 const addRestaurant = (req, res) => {
     try {
@@ -58,18 +44,6 @@ const addRestaurant = (req, res) => {
         res.status(500).json("Error");
     }
 };
-
-// const updateRestaurant = (req, res) => {
-//     try {
-//         Restaurant.findByIdAndUpdate(req.params.id, req.body) // (id документа, новые данные)
-//             .then((result) => {
-//                 res.status(200).json(result);
-//             })
-//             .catch((err) => handleError(res, err));
-//     } catch (e) {
-//         handleError(res, e);
-//     }
-// };
 
 const getSortedRestaurants = (req, res) => {
     try {
@@ -114,28 +88,6 @@ const findRestaurant = (req, res) => {
     }
 };
 
-// const getRestNamesAndIds = (req, res) => {
-//     try {
-//         const { userId } = req.params;
-//         User.findById(userId)
-//             .then((result) => {
-//                 let restPairs = [];
-//                 if (result.favouriteRestaurants.length > 0) {
-//                     result.favouriteRestaurants.forEach((item) => {
-//                         Restaurant.findById(item).then((result) => {
-//                             restPairs.push([result.name, result._id]);
-//                             // console.log(restPairs);
-//                         });
-//                     });
-//                 }
-//                 return restPairs;
-//             })
-//             .then((result) => console.log(result));
-//     } catch (e) {
-//         handleError(res, e);
-//     }
-// };
-
 const searchRestaurant = (req, res) => {
     try {
         const { input } = req.params;
@@ -153,11 +105,8 @@ const searchRestaurant = (req, res) => {
 module.exports = {
     getRestaurants,
     getRestaurantById,
-    // deleteRestaurant,
     addRestaurant,
-    // updateRestaurant,
     getSortedRestaurants,
     findRestaurant,
-    // getRestNamesAndIds,
     searchRestaurant,
 };
