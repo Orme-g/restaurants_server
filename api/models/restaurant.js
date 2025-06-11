@@ -30,7 +30,10 @@ const restaurantSchema = new Schema({
         },
     ],
 
-    rating: [Number],
+    rating: {
+        type: [Number],
+        default: [],
+    },
     adress: {
         type: String,
         required: true,
@@ -55,8 +58,24 @@ const restaurantSchema = new Schema({
     coordinates: { type: String, required: true },
     subway: [{ type: String }],
     events: [String],
+    averageRating: {
+        type: Number,
+        default: 0,
+    },
+});
+
+restaurantSchema.pre("save", function (next) {
+    if (this.isModified("rating")) {
+        this.averageRating = (
+            this.rating.reduce((acc, val) => acc + val, 0) / this.rating.length
+        ).toFixed(3);
+    }
+    next();
 });
 
 const Restaurant = mongoose.model("Restaurant", restaurantSchema);
 
 module.exports = Restaurant;
+// this.rating.length > 0
+// ? this.rating.reduce((acc, val) => acc + val, 0) / this.rating.length
+// : 0;

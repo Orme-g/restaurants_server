@@ -13,19 +13,6 @@ const generateAccessToken = (id) => {
 const handleError = (res, error) => {
     res.status(500).json(error);
 };
-
-// const getUsers = (req, res) => {
-//     try {
-//         User.find()
-//             .then((data) => {
-//                 res.status(200).json(data);
-//             })
-//             .catch((error) => handleError(res, error));
-//     } catch (error) {
-//         handleError(res, error);
-//     }
-// };
-
 const getUserData = (req, res) => {
     try {
         const { userId } = req.params;
@@ -158,20 +145,6 @@ const getReviewedRestaurantsList = (req, res) => {
     }
 };
 
-const addReviewedRestaurant = (req, res) => {
-    try {
-        const { userId, restId } = req.body;
-        User.findByIdAndUpdate(userId, {
-            $addToSet: { reviewedRestaurants: restId },
-            $inc: { reviews: 1 },
-        })
-            .then(() => res.status(200))
-            .catch((error) => handleError(res, error));
-    } catch (error) {
-        handleError(res, error);
-    }
-};
-
 const handleFavouriteRestaurant = (req, res) => {
     try {
         const { userId, restId, type, name } = req.body;
@@ -253,16 +226,13 @@ const updateSingleBlogerDataField = (req, res) => {
 };
 
 module.exports = {
-    // getUsers,
     getUserData,
     registration,
     login,
     changePassword,
     getReviewedRestaurantsList,
-    addReviewedRestaurant,
     changeAvatar,
     setBlogerData,
     handleFavouriteRestaurant,
     updateSingleBlogerDataField,
-    // getFavouriteRestNames,
 };

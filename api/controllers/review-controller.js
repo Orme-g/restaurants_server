@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Review = require("../models/review");
 const Restaurant = require("../models/restaurant");
+const User = require("../models/user");
 
 const handleError = (res, error) => {
     res.status(500).json({ error });
@@ -23,26 +24,26 @@ const getRestaurantReviews = (req, res) => {
 const postRestaurantReview = async (req, res) => {
     const session = await mongoose.startSession();
     try {
-        const { restaurant, rating } = req.body;
+        const { restaurant, rating, userId } = req.body;
         const review = new Review(req.body);
         await session.withTransaction(async () => {
             await review.save({ session });
-            await Restaurant.findByIdAndUpdate(restaurant, { $push: { rating } }, { session });
+            await User.findByIdAndUpdate(
+                userId,
+                { $addToSet: { reviewedRestaurants: restaurant }, $inc: { reviews: 1 } },
+                { session }
+            );
+            const restaurantObject = await Restaurant.findById(restaurant).session(session);
+            if (!restaurantObject) {
+                throw new Error("Ресторан не найден!");
+            }
+            restaurantObject.rating.push(rating);
+            await restaurantObject.save({ session });
         });
         res.status(200).json({ message: "Ваш отзыв отправлен!" });
-        // review
-        //     .save()
-        //     .then(() => {
-        //         res.status(200).json({ message: "Ваш отзыв отправлен!" });
-        //     })
-        //     .catch((err) => handleError(res, err));
-        // Restaurant.findByIdAndUpdate(restaurant, {
-        //     $push: { rating },
-        // })
-        //     .then(() => res.status(200))
-        //     .catch((error) => handleError(res, error));
     } catch (e) {
-        handleError(res, e);
+        // handleError(res, e);
+        res.status(400).json({ e });
     } finally {
         await session.endSession();
     }
@@ -54,7 +55,9 @@ const addAdditionalReview = async (req, res) => {
         const { reviewId, like, dislike, rating, restId: restaurant } = req.body;
         const date = new Date();
         await session.withTransaction(async () => {
-            await Restaurant.findByIdAndUpdate(restaurant, { $push: { rating } }, { session });
+            const restaurantObject = await Restaurant.findById(restaurant).session(session);
+            restaurantObject.rating.push(rating);
+            await restaurantObject.save({ session });
             await Review.findByIdAndUpdate(
                 reviewId,
                 { $set: { additionalReview: { like, dislike, rating, added: date } } },
@@ -62,18 +65,6 @@ const addAdditionalReview = async (req, res) => {
             );
         });
         res.status(200).json({ message: "Ваш отзыв успешно дополнен!", type: "success" });
-        // Restaurant.findByIdAndUpdate(restaurant, {
-        //     $push: { rating },
-        // })
-        //     .then(() =>
-        //         Review.findByIdAndUpdate(reviewId, {
-        //             $set: { additionalReview: { like, dislike, rating, added: date } },
-        //         })
-        //     )
-        //     .then(() =>
-        //         res.status(200).json({ message: "Ваш отзыв успешно дополнен!", type: "success" })
-        //     )
-        // .catch(() => res.status(500).json({ message: "Что-то пошло не так!", type: "error" }));
     } catch (error) {
         res.status(500).json({ message: "Что-то пошло не так!", type: "error" });
     } finally {
