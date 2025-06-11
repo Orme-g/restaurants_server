@@ -55,7 +55,7 @@ const getSortedRestaurants = (req, res) => {
                 : sort === "cheap"
                 ? { bill: 1 }
                 : sort === "best"
-                ? { rating: -1 }
+                ? { averageRating: -1 }
                 : null;
         Restaurant.find()
             .sort(getSortedBy)
