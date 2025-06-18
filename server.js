@@ -1,10 +1,13 @@
 const cors = require("cors");
 const express = require("express");
 // const https = require("https");  //HTTPS Server
-// const fs = require("fs");    //HTTPS Server
-// const path = require("path");    //HTTPS Server
+// const fs = require("fs");
+// const path = require("path");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+// const multer = require("multer");
+// const slugify = require("slugify");
+// const { v4: uuidv4 } = require("uuid");
 
 const restaurantRoutes = require("./api/routes/restaurant-routes");
 const donerRoutes = require("./api/routes/doner-routes");
@@ -14,8 +17,8 @@ const userRoutes = require("./api/routes/user-routes");
 const eventRoutes = require("./api/routes/event-routes");
 const blogRoutes = require("./api/routes/blog-routes");
 
-const PORT = 4000; // For Local development
-// const PORT = 5500; // For NAS/Web
+// const PORT = 4000; // For Local development
+const PORT = 5500; // For NAS/Web
 
 // const URL = "mongodb://localhost:27017/restaurants_db";  // Local database
 // const URL = "mongodb://192.168.31.198:27017/restaurants_db"; // NAS Database
@@ -24,9 +27,9 @@ const URL = "mongodb://192.168.31.198:27017/restaurants_db?replicaSet=replicaset
 const app = express();
 app.use(
     cors({
-        // origin: ["https://weats.ru", "http://weats.ru"], // Web Server
+        origin: ["https://weats.ru", "http://weats.ru"], // Web Server
         // origin: "https://192.168.31.198:7000", // For NAS
-        origin: "http://localhost:5173", // Local development server
+        // origin: "http://localhost:5173", // Local development server
         // origin: "http://localhost:4173", // Local production server
         // methods: ["GET", "POST"]       // Какие запросы разрешены
     })
@@ -41,6 +44,9 @@ app.use(reviewRoutes);
 app.use(userRoutes);
 app.use(eventRoutes);
 app.use(blogRoutes);
+//Getting images
+app.use("/images", express.static("/weats")); // For website
+// app.use("/images", express.static("/Users/ila/static")); // Local
 
 // To use HTTPS Protocol on Server
 // const sslServer = https.createServer(
