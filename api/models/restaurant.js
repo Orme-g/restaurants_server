@@ -22,6 +22,7 @@ const restaurantSchema = new Schema({
             required: true,
         },
     ],
+    title_image: String,
     cousine: [
         {
             type: String,

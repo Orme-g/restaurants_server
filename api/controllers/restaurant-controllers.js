@@ -135,17 +135,6 @@ const upload = multer({
     },
 });
 
-const uploadRestaurantImages = (req, res) => {
-    const files = req.files;
-    const folderName = req.restaurantFolder;
-    const urls = files.map(
-        (file) => `https://weats.ru/api/images/restaurants/${folderName}/${file.originalname}`
-    );
-    res.json({
-        restaurant: folderName,
-        uploaded: urls,
-    });
-};
 const addRestaurant = async (req, res) => {
     const session = await mongoose.startSession();
     try {
@@ -163,10 +152,12 @@ const addRestaurant = async (req, res) => {
             city,
             coordinates,
             subway,
+            titleImageName,
         } = req.body;
         const urls = files.map(
             (file) => `https://weats.ru/api/images/restaurants/${folderName}/${file.originalname}`
         );
+        const title_image = `https://weats.ru/api/images/restaurants/${folderName}/${titleImageName}`;
         const result = await session.withTransaction(async () => {
             const restaurantData = {
                 name,
@@ -179,13 +170,14 @@ const addRestaurant = async (req, res) => {
                 city,
                 coordinates,
                 subway,
+                title_image,
                 images: urls,
             };
             const restaurant = new Restaurant(restaurantData);
             await restaurant.save({ session });
             return restaurant;
         });
-        res.status(201).json({ message: "success", restaurant: result });
+        res.status(201).json({ message: "success" });
     } catch (error) {
         console.error("Error when creating new Restaurant", error);
         if (req.restaurantFolderPath && fs.existsSync(req.restaurantFolderPath)) {
@@ -204,6 +196,5 @@ module.exports = {
     getSortedRestaurants,
     findRestaurant,
     searchRestaurant,
-    uploadRestaurantImages,
     upload,
 };

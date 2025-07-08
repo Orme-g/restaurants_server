@@ -7,7 +7,6 @@ const {
     getSortedRestaurants,
     findRestaurant,
     searchRestaurant,
-    uploadRestaurantImages,
     upload,
 } = require("../controllers/restaurant-controllers");
 
@@ -20,6 +19,5 @@ router.get("/sorted-restaurants/:sort", getSortedRestaurants);
 router.post("/find-restaurant/selection", findRestaurant);
 router.get("/find-restaurant/selection", findRestaurant);
 router.get("/search-restaurant/:input", searchRestaurant);
-router.post("/upload", upload.array("images", 12), uploadRestaurantImages);
 
 module.exports = router;
