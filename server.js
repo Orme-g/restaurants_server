@@ -15,6 +15,7 @@ const donerRoutes = require("./api/routes/doner-routes");
 const commentRoutes = require("./api/routes/comment-routes");
 const reviewRoutes = require("./api/routes/review-routes");
 const userRoutes = require("./api/routes/user-routes");
+const authRoutes = require("./api/routes/auth-routes");
 const eventRoutes = require("./api/routes/event-routes");
 const blogRoutes = require("./api/routes/blog-routes");
 
@@ -44,6 +45,7 @@ app.use(donerRoutes);
 app.use(commentRoutes);
 app.use(reviewRoutes);
 app.use(userRoutes);
+app.use(authRoutes);
 app.use(eventRoutes);
 app.use(blogRoutes);
 //Getting images
