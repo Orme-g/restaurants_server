@@ -4,6 +4,7 @@ const { authMiddleware } = require("../../middleware/middleware");
 const {
     registration,
     login,
+    refresh,
     cookieMake,
     cookieCheck,
     logout,
@@ -12,11 +13,12 @@ const {
 
 const router = express.Router();
 
-router.post("/register", registration);
-router.post("/login", login);
-router.get("/cookie-make", cookieMake);
-router.get("/cookie-check", cookieCheck);
-router.get("/logout", logout); // Make POST
-router.get("/try", authMiddleware, tryThis);
+router.post("/auth/register", registration);
+router.post("/auth/login", login);
+router.post("/auth/refresh", refresh);
+router.post("/auth/cookie-make", cookieMake);
+router.get("/auth/cookie-check", cookieCheck);
+router.post("/auth/logout", logout);
+router.get("/auth/try", authMiddleware, tryThis);
 
 module.exports = router;

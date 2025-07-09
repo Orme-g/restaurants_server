@@ -3,6 +3,10 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { secret } = require("../../config");
 
+const handleError = (res, error) => {
+    res.status(500).json(error);
+};
+
 const registration = async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -13,7 +17,7 @@ const registration = async (req, res) => {
         const hashPassword = bcrypt.hashSync(password, 7);
         const user = new User({ ...req.body, password: hashPassword });
         user.save()
-            .then(res.status(200).json({ message: "Регистрация прошла успешно" }))
+            .then(res.status(200).json("Регистрация прошла успешно"))
             .catch((error) => handleError(res, error));
     } catch (err) {
         res.status(500).json(`Ошибка регистрации ${err}`);
@@ -68,6 +72,25 @@ const login = async (req, res) => {
         res.status(500).json(`Ошибка входа ${err}`);
     }
 };
+const refresh = (req, res) => {
+    try {
+        const refreshToken = req.cookies.refreshToken;
+        if (!refreshToken) {
+            return res.status(401).json("Ошибка проверки токена: Токен не найден");
+        }
+        const decoded = jwt.verify(refreshToken, secret);
+        const newAccessToken = jwt.sign({ id: decoded.id }, secret, { expiresIn: "15m" });
+        res.cookie("accessToken", newAccessToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "Strict",
+            maxAge: 15 * 60 * 1000,
+        });
+        res.status(200).json("Новый токен выдан");
+    } catch (error) {
+        res.status(401).json("Ошибка проверки токена: Токен недействительный");
+    }
+};
 const cookieMake = (req, res) => {
     try {
         const accessToken = jwt.sign({ id: "222333" }, secret, { expiresIn: "15m" });
@@ -78,6 +101,7 @@ const cookieMake = (req, res) => {
             secure: true,
             sameSite: "Strict",
             maxAge: 15 * 60 * 1000,
+            // maxAge: 5000,
         });
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
@@ -85,7 +109,7 @@ const cookieMake = (req, res) => {
             sameSite: "Strict",
             maxAge: 30 * 24 * 60 * 60 * 1000,
         });
-        res.json("Hello, User!");
+        res.status(200).json("Hello, User!");
     } catch (error) {
         handleError(req, error);
     }
@@ -103,18 +127,23 @@ const logout = (req, res) => {
     try {
         res.clearCookie("accessToken");
         res.clearCookie("refreshToken");
-        res.status(200).json("Lol");
+        res.status(200).json("Cookies successfully cleared");
     } catch (error) {
         handleError(res, error);
     }
 };
 const tryThis = (req, res) => {
-    res.status(200).json("User logged - ok!");
+    try {
+        res.status(200).json("User logged - ok!");
+    } catch (error) {
+        handleError(res, error);
+    }
 };
 
 module.exports = {
     registration,
     login,
+    refresh,
     cookieMake,
     cookieCheck,
     logout,

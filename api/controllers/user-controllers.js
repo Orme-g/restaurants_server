@@ -1,7 +1,5 @@
 const User = require("../models/user");
-const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { secret } = require("../../config");
 
 const handleError = (res, error) => {
     res.status(500).json(error);
