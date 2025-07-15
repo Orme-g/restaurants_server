@@ -18,9 +18,9 @@ const getRestaurants = (req, res) => {
             .then((restaurants) => {
                 res.status(200).json(restaurants);
             })
-            .catch((e) => res.status(400));
+            .catch((e) => res.status(400).json("Ошибка при получении списка"));
     } catch (e) {
-        handleError(res, e);
+        res.status(500).json("Server error");
     }
 };
 
@@ -183,7 +183,7 @@ const addRestaurant = async (req, res) => {
         if (req.restaurantFolderPath && fs.existsSync(req.restaurantFolderPath)) {
             fs.rmSync(req.restaurantFolderPath, { recursive: true, force: true });
         }
-        res.status(500).json({ message: "error", error: error.message });
+        res.status(500).json({ message: "Ошибка добавления ресторана", error: error.message });
     } finally {
         session.endSession();
     }

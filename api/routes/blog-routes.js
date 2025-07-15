@@ -1,4 +1,5 @@
 const express = require("express");
+const { authMiddleware } = require("../../middleware/middleware");
 
 const {
     getPostData,
@@ -18,6 +19,6 @@ router.get("/blog/top-authors", getTopAuthors);
 router.get("/blog/badge-data/:userId", getDataForBadge);
 router.get("/blog/user-posts/:userId", getUserPosts);
 router.get("/blog/blog-posts/:theme", getPostsByTheme);
-router.patch("/blog/update-likes-comments", updateLikesOrCommentsCount);
+router.patch("/blog/update-likes-comments", authMiddleware, updateLikesOrCommentsCount);
 
 module.exports = router;

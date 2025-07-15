@@ -82,9 +82,10 @@ const getPostsByTheme = (req, res) => {
 };
 
 const updateLikesOrCommentsCount = async (req, res) => {
+    const userId = req.user.id;
     const session = await mongoose.startSession();
     try {
-        const { postId, field, userId } = req.body;
+        const { postId, field } = req.body;
 
         await session.withTransaction(async () => {
             if (field === "like") {

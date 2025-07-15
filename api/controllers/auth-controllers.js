@@ -6,7 +6,19 @@ const { secret } = require("../../config");
 const handleError = (res, error) => {
     res.status(500).json(error);
 };
-
+const me = (req, res) => {
+    try {
+        const userId = req.user.id;
+        User.findById(userId)
+            // .then((userData) => res.status(200).json(userData))
+            .then(({ name, _id, role, username }) =>
+                res.status(200).json({ name, _id, role, username })
+            )
+            .catch((error) => res.status(404).json("User not found"));
+    } catch (error) {
+        handleError(res, error);
+    }
+};
 const registration = async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -17,10 +29,10 @@ const registration = async (req, res) => {
         const hashPassword = bcrypt.hashSync(password, 7);
         const user = new User({ ...req.body, password: hashPassword });
         user.save()
-            .then(res.status(200).json("Регистрация прошла успешно"))
+            .then(res.status(200).json({ message: "Регистрация прошла успешно" }))
             .catch((error) => handleError(res, error));
     } catch (err) {
-        res.status(500).json(`Ошибка регистрации ${err}`);
+        res.status(500).json(`Ошибка регистрации. Свяжитесь с поддержкой.`);
     }
 };
 
@@ -52,8 +64,8 @@ const login = async (req, res) => {
         const { name, avatar, status, _id, registeredAt, comments, reviews, email, role } = user;
         // const token = generateAccessToken(_id);
         return res.status(200).json({
-            accessToken,
-            refreshToken,
+            // accessToken,
+            // refreshToken,
             // token,
             name,
             username,
@@ -86,9 +98,26 @@ const refresh = (req, res) => {
             sameSite: "Strict",
             maxAge: 15 * 60 * 1000,
         });
-        res.status(200).json("Новый токен выдан");
+        res.status(200).json({ message: "Token issued" });
     } catch (error) {
         res.status(401).json("Ошибка проверки токена: Токен недействительный");
+    }
+};
+const logout = (req, res) => {
+    try {
+        res.clearCookie("accessToken");
+        res.clearCookie("refreshToken");
+        res.status(200).json({ message: "Выход из профиля" });
+    } catch (error) {
+        handleError(res, error);
+    }
+};
+const clearAccessToken = (req, res) => {
+    try {
+        res.clearCookie("accessToken");
+        res.status(200).json("Access token cleared");
+    } catch (error) {
+        handleError(res, error);
     }
 };
 const cookieMake = (req, res) => {
@@ -123,24 +152,19 @@ const cookieCheck = (req, res) => {
         handleError(res, error);
     }
 };
-const logout = (req, res) => {
-    try {
-        res.clearCookie("accessToken");
-        res.clearCookie("refreshToken");
-        res.status(200).json("Cookies successfully cleared");
-    } catch (error) {
-        handleError(res, error);
-    }
-};
 const tryThis = (req, res) => {
     try {
-        res.status(200).json("User logged - ok!");
+        const userId = req.user.id;
+
+        // res.status(200).json("User logged - ok!");
+        res.status(200).json({ message: userId });
     } catch (error) {
         handleError(res, error);
     }
 };
 
 module.exports = {
+    me,
     registration,
     login,
     refresh,
@@ -148,4 +172,5 @@ module.exports = {
     cookieCheck,
     logout,
     tryThis,
+    clearAccessToken,
 };

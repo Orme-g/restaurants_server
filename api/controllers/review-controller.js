@@ -15,9 +15,9 @@ const getRestaurantReviews = (req, res) => {
             .then((reviews) => {
                 res.status(200).json(reviews);
             })
-            .catch((err) => handleError(res, err));
+            .catch((err) => res.status(404).json("Ошибка получения списка отзывов"));
     } catch (e) {
-        handleError(res, e);
+        res.status(500).json("Ошибка сервера");
     }
 };
 
@@ -64,9 +64,9 @@ const addAdditionalReview = async (req, res) => {
                 { session }
             );
         });
-        res.status(200).json({ message: "Ваш отзыв успешно дополнен!", type: "success" });
+        res.status(200).json({ message: "Ваш отзыв успешно дополнен!" });
     } catch (error) {
-        res.status(500).json({ message: "Что-то пошло не так!", type: "error" });
+        res.status(500).json("Что-то пошло не так!");
     } finally {
         await session.endSession();
     }
