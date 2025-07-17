@@ -24,6 +24,17 @@ const getUserPublicData = (req, res) => {
     }
 };
 
+const getUserBlogPublicData = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        User.findById(userId)
+            .then(({ blogData }) => res.status(200).json(blogData))
+            .catch((error) => res.status(500).json("Server error"));
+    } catch (error) {
+        handleError(res, error);
+    }
+};
+
 const getUserProfileData = (req, res) => {
     try {
         const userId = req.user.id;
@@ -68,7 +79,6 @@ const changeAvatar = (req, res) => {
 const getReviewedRestaurantsList = (req, res) => {
     try {
         const userId = req.user.id;
-        // const { userId } = req.params;
         User.findById(userId)
             .then(({ reviewedRestaurants }) => res.status(200).json(reviewedRestaurants))
             .catch((error) => handleError(res, error));
@@ -93,6 +103,17 @@ const getRatedCommentsList = (req, res) => {
         const userId = req.user.id;
         User.findById(userId)
             .then(({ ratedComments }) => res.status(200).json(ratedComments))
+            .catch((error) => res.status(500).json("Server error"));
+    } catch (error) {
+        handleError(res, error);
+    }
+};
+
+const getRatedBlogPosts = (req, res) => {
+    try {
+        const userId = req.user.id;
+        User.findById(userId)
+            .then(({ ratedBlogPosts }) => res.status(200).json(ratedBlogPosts))
             .catch((error) => res.status(500).json("Server error"));
     } catch (error) {
         handleError(res, error);
@@ -131,7 +152,8 @@ const handleFavouriteRestaurant = (req, res) => {
 };
 const setBlogerData = async (req, res) => {
     try {
-        const { blogerName, blogCity, aboutMe, blogAvatar, userId } = req.body;
+        const userId = req.user.id;
+        const { blogerName, blogCity, aboutMe, blogAvatar } = req.body;
         const checkUsername = await User.findOne({ "blogData.blogerName": blogerName });
         if (checkUsername) {
             return res.status(400).json("Имя уже занято");
@@ -182,11 +204,13 @@ const updateSingleBlogerDataField = (req, res) => {
 
 module.exports = {
     getUserPublicData,
+    getUserBlogPublicData,
     getUserProfileData,
     changePassword,
     getReviewedRestaurantsList,
     getFavoriteRestaurantsList,
     getRatedCommentsList,
+    getRatedBlogPosts,
     changeAvatar,
     setBlogerData,
     handleFavouriteRestaurant,
