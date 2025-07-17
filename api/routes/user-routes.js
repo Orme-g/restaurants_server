@@ -1,9 +1,14 @@
 const express = require("express");
 
+const { authMiddleware } = require("../../middleware/middleware");
+
 const {
-    getUserData,
+    getUserPublicData,
+    getUserProfileData,
     changePassword,
     getReviewedRestaurantsList,
+    getFavoriteRestaurantsList,
+    getRatedCommentsList,
     changeAvatar,
     setBlogerData,
     handleFavouriteRestaurant,
@@ -12,12 +17,15 @@ const {
 
 const router = express.Router();
 
-router.get("/user/getdata/:userId", getUserData);
-router.patch("/user/profile", changePassword);
-router.get("/user/reviewedRestaurants/:userId", getReviewedRestaurantsList);
-router.patch("/user/changeAvatar", changeAvatar);
-router.patch("/user/setBlogerData", setBlogerData);
-router.patch("/user/handleFavouriteRestaurant", handleFavouriteRestaurant);
-router.patch("/user/update-data-field", updateSingleBlogerDataField);
+router.get("/user/getdata/:userId", getUserPublicData);
+router.get("/user/profile/getData", authMiddleware, getUserProfileData);
+router.patch("/user/profile/changePassword", changePassword);
+router.get("/user/reviewedRestaurants", authMiddleware, getReviewedRestaurantsList);
+router.get("/user/favoriteRestaurants", authMiddleware, getFavoriteRestaurantsList);
+router.get("/user/ratedComments", authMiddleware, getRatedCommentsList);
+router.patch("/user/profile/changeAvatar", changeAvatar);
+router.patch("/user/profile/setBlogerData", setBlogerData);
+router.patch("/user/handleFavouriteRestaurant", authMiddleware, handleFavouriteRestaurant);
+router.patch("/user/profile/updateDataField", updateSingleBlogerDataField);
 
 module.exports = router;

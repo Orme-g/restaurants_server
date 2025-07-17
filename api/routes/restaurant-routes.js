@@ -1,23 +1,28 @@
 const express = require("express");
 
 const {
-    getRestaurants,
+    getLastAddedRestaurants,
     getRestaurantById,
-    addRestaurant,
+    addNewRestaurant,
     getSortedRestaurants,
     findRestaurant,
     searchRestaurant,
     upload,
+    getRestaurantReviews,
+    postRestaurantReview,
+    addAdditionalReview,
 } = require("../controllers/restaurant-controllers");
 
 const router = express.Router();
 
-router.get("/restaurants", getRestaurants);
+router.get("/restaurants/getLastAddedRestaurants", getLastAddedRestaurants);
 router.get("/restaurants/:id", getRestaurantById);
-router.post("/restaurants/add", upload.array("images", 12), addRestaurant);
+router.post("/restaurants/addNewRestaurant", upload.array("images", 12), addNewRestaurant);
 router.get("/sorted-restaurants/:sort", getSortedRestaurants);
 router.post("/find-restaurant/selection", findRestaurant);
-router.get("/find-restaurant/selection", findRestaurant);
 router.get("/search-restaurant/:input", searchRestaurant);
+router.get("/restaurant/reviews/:restaurant", getRestaurantReviews);
+router.post("/restaurant/reviews/postReview", postRestaurantReview);
+router.patch("/restaurant/reviews/addAdditional", addAdditionalReview);
 
 module.exports = router;

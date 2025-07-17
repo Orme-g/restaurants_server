@@ -1,15 +1,15 @@
-const express = require("express");
+// const express = require("express");
 
-const {
-    getRestaurantReviews,
-    postRestaurantReview,
-    addAdditionalReview,
-} = require("../controllers/review-controller");
+// const {
+//     getRestaurantReviews,
+//     postRestaurantReview,
+//     addAdditionalReview,
+// } = require("../controllers/review-controller");
 
-const router = express.Router();
+// const router = express.Router();
 
-router.get("/reviews/:restaurant", getRestaurantReviews);
-router.post("/reviews", postRestaurantReview);
-router.patch("/reviews/addAdditional", addAdditionalReview);
+// router.get("/reviews/:restaurant", getRestaurantReviews);
+// router.post("/reviews/postReview", postRestaurantReview);
+// router.patch("/reviews/addAdditionalReview", addAdditionalReview);
 
-module.exports = router;
+// module.exports = router;

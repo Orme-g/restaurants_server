@@ -4,7 +4,7 @@ const { getAllDoners, getDonerById, addDonerArticle } = require("../controllers/
 
 const router = express.Router();
 
-router.get("/best-doner/", getAllDoners);
+router.get("/best-doner/getAllDonersList", getAllDoners);
 router.get("/best-doner/:id", getDonerById);
 router.post("/best-doner/add", addDonerArticle);
 

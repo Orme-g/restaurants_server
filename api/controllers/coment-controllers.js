@@ -71,7 +71,8 @@ const deleteComment = (req, res) => {
 const commentEvaluation = async (req, res) => {
     const session = await mongoose.startSession();
     try {
-        const { id: commentId, userId, type } = req.body;
+        const userId = req.user.id;
+        const { id: commentId, type } = req.body;
         if (type !== "like" && type !== "dislike") {
             return res.status(400).json("Invalid type provided");
         }

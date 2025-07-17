@@ -10,7 +10,6 @@ const me = (req, res) => {
     try {
         const userId = req.user.id;
         User.findById(userId)
-            // .then((userData) => res.status(200).json(userData))
             .then(({ name, _id, role, username }) =>
                 res.status(200).json({ name, _id, role, username })
             )
@@ -61,24 +60,8 @@ const login = async (req, res) => {
             sameSite: "Strict",
             maxAge: 30 * 24 * 60 * 60 * 1000,
         });
-        const { name, avatar, status, _id, registeredAt, comments, reviews, email, role } = user;
-        // const token = generateAccessToken(_id);
         return res.status(200).json({
-            // accessToken,
-            // refreshToken,
-            // token,
-            name,
-            username,
-            avatar,
-            status,
-            _id,
-            registeredAt,
-            comments,
-            reviews,
-            email,
-            login,
-            role,
-            message: `Здравствуйте, ${name}`,
+            message: `Здравствуйте, ${user.name}`,
         });
     } catch (err) {
         res.status(500).json(`Ошибка входа ${err}`);
@@ -115,7 +98,8 @@ const logout = (req, res) => {
 const clearAccessToken = (req, res) => {
     try {
         res.clearCookie("accessToken");
-        res.status(200).json("Access token cleared");
+        res.clearCookie("refreshToken");
+        res.status(200).json("All tokens cleared");
     } catch (error) {
         handleError(res, error);
     }

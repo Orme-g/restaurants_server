@@ -4,46 +4,36 @@ const bcrypt = require("bcrypt");
 const handleError = (res, error) => {
     res.status(500).json(error);
 };
-const getUserData = (req, res) => {
+
+const getUserPublicData = (req, res) => {
     try {
         const { userId } = req.params;
         User.findById(userId)
-            .then(
-                ({
+            .then(({ avatar, name, username, comments, reviews }) => {
+                res.status(200).json({
                     avatar,
                     name,
-                    registeredAt,
                     username,
-                    email,
                     comments,
                     reviews,
-                    favouriteRestaurants,
-                    ratedComments,
-                    _id,
-                    bloger,
-                    blogData,
-                    ratedBlogPosts,
-                }) => {
-                    res.status(200).json({
-                        avatar,
-                        name,
-                        registeredAt,
-                        username,
-                        email,
-                        comments,
-                        reviews,
-                        favouriteRestaurants,
-                        ratedComments,
-                        _id,
-                        bloger,
-                        blogData,
-                        ratedBlogPosts,
-                    });
-                }
-            )
+                });
+            })
             .catch((error) => res.status(500).json("Ошибка"));
     } catch (e) {
         res.status(500).json(`Что-то пошло не так ${e}`);
+    }
+};
+
+const getUserProfileData = (req, res) => {
+    try {
+        const userId = req.user.id;
+        User.findById(userId)
+            .select("-password -__v")
+            .lean()
+            .then((userData) => res.status(200).json(userData))
+            .catch((error) => res.status(404).json("User not found"));
+    } catch (error) {
+        handleError(res, error);
     }
 };
 
@@ -77,7 +67,8 @@ const changeAvatar = (req, res) => {
 
 const getReviewedRestaurantsList = (req, res) => {
     try {
-        const { userId } = req.params;
+        const userId = req.user.id;
+        // const { userId } = req.params;
         User.findById(userId)
             .then(({ reviewedRestaurants }) => res.status(200).json(reviewedRestaurants))
             .catch((error) => handleError(res, error));
@@ -86,9 +77,32 @@ const getReviewedRestaurantsList = (req, res) => {
     }
 };
 
+const getFavoriteRestaurantsList = (req, res) => {
+    try {
+        const userId = req.user.id;
+        User.findById(userId)
+            .then(({ favouriteRestaurants }) => res.status(200).json(favouriteRestaurants))
+            .catch((error) => res.status(500).json("Server error"));
+    } catch (error) {
+        handleError(res, error);
+    }
+};
+
+const getRatedCommentsList = (req, res) => {
+    try {
+        const userId = req.user.id;
+        User.findById(userId)
+            .then(({ ratedComments }) => res.status(200).json(ratedComments))
+            .catch((error) => res.status(500).json("Server error"));
+    } catch (error) {
+        handleError(res, error);
+    }
+};
+
 const handleFavouriteRestaurant = (req, res) => {
     try {
-        const { userId, restId, type, name } = req.body;
+        const userId = req.user.id;
+        const { restId, type, name } = req.body;
         switch (type) {
             case "add":
                 User.findByIdAndUpdate(userId, {
@@ -167,9 +181,12 @@ const updateSingleBlogerDataField = (req, res) => {
 };
 
 module.exports = {
-    getUserData,
+    getUserPublicData,
+    getUserProfileData,
     changePassword,
     getReviewedRestaurantsList,
+    getFavoriteRestaurantsList,
+    getRatedCommentsList,
     changeAvatar,
     setBlogerData,
     handleFavouriteRestaurant,

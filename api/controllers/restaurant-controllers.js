@@ -1,4 +1,6 @@
 const Restaurant = require("../models/restaurant");
+const Review = require("../models/review");
+const User = require("../models/user");
 const slugify = require("slugify");
 const fs = require("fs");
 const path = require("path");
@@ -10,11 +12,12 @@ const handleError = (res, error) => {
     res.status(400).json({ error });
 };
 
-const getRestaurants = (req, res) => {
+const getLastAddedRestaurants = (req, res) => {
     try {
+        const { limit } = req.query;
         Restaurant.find()
             .sort({ createdAt: -1 })
-            .limit(6)
+            .limit(+limit)
             .then((restaurants) => {
                 res.status(200).json(restaurants);
             })
@@ -135,7 +138,7 @@ const upload = multer({
     },
 });
 
-const addRestaurant = async (req, res) => {
+const addNewRestaurant = async (req, res) => {
     const session = await mongoose.startSession();
     try {
         normalizeArrayFields(req.body, ["subway", "cousine"]);
@@ -177,24 +180,94 @@ const addRestaurant = async (req, res) => {
             await restaurant.save({ session });
             return restaurant;
         });
-        res.status(201).json({ message: "success" });
+        res.status(201).json({ message: "Ресторан добавлен" });
     } catch (error) {
-        console.error("Error when creating new Restaurant", error);
         if (req.restaurantFolderPath && fs.existsSync(req.restaurantFolderPath)) {
             fs.rmSync(req.restaurantFolderPath, { recursive: true, force: true });
         }
-        res.status(500).json({ message: "Ошибка добавления ресторана", error: error.message });
+        res.status(500).json(`Ошибка добавления ресторана": ${error.message}`);
     } finally {
         session.endSession();
     }
 };
 
+// Restaurants Reviews
+
+const getRestaurantReviews = (req, res) => {
+    try {
+        const { restaurant } = req.params;
+        Review.find({ restaurant })
+            .sort({ createdAt: -1 })
+            .then((reviews) => {
+                res.status(200).json(reviews);
+            })
+            .catch((err) => res.status(404).json("Ошибка получения списка отзывов"));
+    } catch (e) {
+        res.status(500).json("Ошибка сервера");
+    }
+};
+
+const postRestaurantReview = async (req, res) => {
+    const session = await mongoose.startSession();
+    try {
+        const { restaurant, rating, userId } = req.body;
+        const review = new Review(req.body);
+        await session.withTransaction(async () => {
+            await review.save({ session });
+            await User.findByIdAndUpdate(
+                userId,
+                { $addToSet: { reviewedRestaurants: restaurant }, $inc: { reviews: 1 } },
+                { session }
+            );
+            const restaurantObject = await Restaurant.findById(restaurant).session(session);
+            if (!restaurantObject) {
+                throw new Error("Ресторан не найден!");
+            }
+            restaurantObject.rating.push(rating);
+            await restaurantObject.save({ session });
+        });
+        res.status(200).json({ message: "Ваш отзыв отправлен!" });
+    } catch (e) {
+        // handleError(res, e);
+        res.status(400).json({ e });
+    } finally {
+        await session.endSession();
+    }
+};
+
+const addAdditionalReview = async (req, res) => {
+    const session = await mongoose.startSession();
+    try {
+        const { reviewId, like, dislike, rating, restId: restaurant } = req.body;
+        const date = new Date();
+        await session.withTransaction(async () => {
+            const restaurantObject = await Restaurant.findById(restaurant).session(session);
+            restaurantObject.rating.push(rating);
+            await restaurantObject.save({ session });
+            await Review.findByIdAndUpdate(
+                reviewId,
+                { $set: { additionalReview: { like, dislike, rating, added: date } } },
+                { session }
+            );
+        });
+        res.status(200).json({ message: "Ваш отзыв успешно дополнен!" });
+    } catch (error) {
+        res.status(500).json("Что-то пошло не так!");
+    } finally {
+        await session.endSession();
+    }
+};
+
 module.exports = {
-    getRestaurants,
+    getLastAddedRestaurants,
     getRestaurantById,
-    addRestaurant,
+    addNewRestaurant,
     getSortedRestaurants,
     findRestaurant,
     searchRestaurant,
     upload,
+    // Reviews
+    getRestaurantReviews,
+    postRestaurantReview,
+    addAdditionalReview,
 };
