@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.get("/comments/:topic", getCommentsForTopic);
 router.get("/comments/single-comment/:commentId", getSingleCommentData);
-router.post("/comments/post-comment", postComment);
+router.post("/comments/post-comment", authMiddleware, postComment);
 router.patch("/comments/delete-comment", deleteComment);
 router.patch("/comments/evaluate-comment", authMiddleware, commentEvaluation);
 

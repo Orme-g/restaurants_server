@@ -11,6 +11,7 @@ const {
     logout,
     tryThis,
     clearAccessToken,
+    clearAllTokens,
 } = require("../controllers/auth-controllers");
 
 const router = express.Router();
@@ -23,5 +24,6 @@ router.get("/auth/cookie-check", cookieCheck);
 router.post("/auth/logout", logout);
 router.get("/auth/try", authMiddleware, tryThis);
 router.post("/auth/clearAccessToken", clearAccessToken);
+router.post("/auth/clearAllTokens", clearAllTokens);
 
 module.exports = router;

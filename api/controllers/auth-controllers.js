@@ -98,6 +98,14 @@ const logout = (req, res) => {
 const clearAccessToken = (req, res) => {
     try {
         res.clearCookie("accessToken");
+        res.status(200).json("Access token cleared");
+    } catch (error) {
+        handleError(res, error);
+    }
+};
+const clearAllTokens = (req, res) => {
+    try {
+        res.clearCookie("accessToken");
         res.clearCookie("refreshToken");
         res.status(200).json("All tokens cleared");
     } catch (error) {
@@ -157,4 +165,5 @@ module.exports = {
     logout,
     tryThis,
     clearAccessToken,
+    clearAllTokens,
 };

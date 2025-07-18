@@ -1,4 +1,5 @@
 const express = require("express");
+const { authMiddleware } = require("../../middleware/middleware");
 
 const {
     getLastAddedRestaurants,
@@ -22,7 +23,7 @@ router.get("/sorted-restaurants/:sort", getSortedRestaurants);
 router.post("/find-restaurant/selection", findRestaurant);
 router.get("/search-restaurant/:input", searchRestaurant);
 router.get("/restaurant/reviews/:restaurant", getRestaurantReviews);
-router.post("/restaurant/reviews/postReview", postRestaurantReview);
-router.patch("/restaurant/reviews/addAdditional", addAdditionalReview);
+router.post("/restaurant/reviews/postReview", authMiddleware, postRestaurantReview);
+router.patch("/restaurant/reviews/addAdditional", authMiddleware, addAdditionalReview);
 
 module.exports = router;

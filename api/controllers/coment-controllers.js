@@ -32,8 +32,8 @@ const getSingleCommentData = (req, res) => {
 const postComment = async (req, res) => {
     const session = await mongoose.startSession();
     try {
+        const userId = req.user.id;
         const comment = new Comment(req.body);
-        const { userId } = req.body;
         if (!userId) {
             return res.status(400).json("User id not provided!");
         }
