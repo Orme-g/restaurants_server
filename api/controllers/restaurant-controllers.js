@@ -66,6 +66,7 @@ const getSortedRestaurants = (req, res) => {
 
 const findRestaurant = (req, res) => {
     try {
+        console.log(req.body);
         const { subway, cousine, sortBy } = req.body;
         const sort = sortBy === "expensive" ? -1 : 1;
         Restaurant.find({ cousine: { $in: cousine }, subway: { $in: [subway] } })

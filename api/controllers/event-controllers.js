@@ -32,7 +32,7 @@ const addNewEvent = (req, res) => {
         const newEvent = new Event(req.body);
         newEvent
             .save()
-            .then(() => res.status(201).json("Success"))
+            .then(() => res.status(201).json({ message: "Success" }))
             .catch((error) => res.status(500).json(error));
     } catch (e) {
         handleError(res, e);

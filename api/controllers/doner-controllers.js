@@ -36,7 +36,7 @@ const addDonerArticle = (req, res) => {
         newArticle
             .save()
             .then(() => {
-                res.status(201).json("Success");
+                res.status(201).json({ message: "Success" });
             })
             .catch((error) => handleError(res, error));
     } catch (error) {

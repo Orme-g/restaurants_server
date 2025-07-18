@@ -50,7 +50,8 @@ const getUserProfileData = (req, res) => {
 
 const changePassword = async (req, res) => {
     try {
-        const { userId, oldPass, newPass } = req.body;
+        const userId = req.user.id;
+        const { oldPass, newPass } = req.body;
         const { password } = await User.findOne({ _id: userId });
         const checkPassword = bcrypt.compareSync(oldPass, password);
         if (!checkPassword) {
@@ -58,7 +59,7 @@ const changePassword = async (req, res) => {
         }
         const hashPassword = bcrypt.hashSync(newPass, 7);
         User.findByIdAndUpdate(userId, { $set: { password: hashPassword } })
-            .then(() => res.status(200).json("Пароль успешно изменён"))
+            .then(() => res.status(200).json({ message: "Пароль успешно изменён" }))
             .catch((err) => res.status(500).json({ err }));
     } catch (error) {
         handleError(res, error);
@@ -67,9 +68,10 @@ const changePassword = async (req, res) => {
 
 const changeAvatar = (req, res) => {
     try {
-        const { userId, avatarData } = req.body;
+        const userId = req.user.id;
+        const { avatarData } = req.body;
         User.findByIdAndUpdate(userId, { $set: { avatar: avatarData } })
-            .then(() => res.status(200).json("Аватар успешно изменён"))
+            .then(() => res.status(200).json({ message: "Аватар успешно изменён" }))
             .catch((err) => res.status(500).json("Что-то пошло не так..."));
     } catch (error) {
         handleError(res, error);
@@ -129,19 +131,15 @@ const handleFavouriteRestaurant = (req, res) => {
                 User.findByIdAndUpdate(userId, {
                     $addToSet: { favouriteRestaurants: [name, restId] },
                 })
-                    .then(() =>
-                        res.status(200).json({ message: "Добавлен в избранное", type: "success" })
-                    )
-                    .catch((error) => handleError(res, error));
+                    .then(() => res.status(200).json({ message: "Добавлен в избранное" }))
+                    .catch((error) => res.status(500).json("Ошибка сервера."));
                 break;
             case "remove":
                 User.findByIdAndUpdate(userId, {
                     $pull: { favouriteRestaurants: { $elemMatch: { $eq: restId } } },
                 })
-                    .then(() =>
-                        res.status(200).json({ message: "Убран из избранного", type: "warning" })
-                    )
-                    .catch((error) => handleError(res, error));
+                    .then(() => res.status(200).json({ message: "Убран из избранного" }))
+                    .catch((error) => res.status(500).json("Ошибка сервера."));
                 break;
             default:
                 break;
@@ -172,9 +170,7 @@ const setBlogerData = async (req, res) => {
                 bloger: true,
             },
         })
-            .then(() =>
-                res.status(200).json({ message: "Вы зарегистрированы в Блоге", type: "success" })
-            )
+            .then(() => res.status(200).json({ message: "Вы зарегистрированы в Блоге" }))
             .catch((error) => handleError(res, error));
     } catch (e) {
         res.status(500).json(`Error: ${e}`);
@@ -183,17 +179,20 @@ const setBlogerData = async (req, res) => {
 
 const updateSingleBlogerDataField = (req, res) => {
     try {
-        const { userId, field, data } = req.body;
+        const userId = req.user.id;
+        const { field, data } = req.body;
         switch (field) {
             case "aboutMe":
                 User.findByIdAndUpdate(userId, { $set: { "blogData.aboutMe": data } })
-                    .then(() => res.status(200).json("Field Updated"))
+                    .then(() => res.status(200).json({ message: "Поле успешно изменено" }))
                     .catch((error) => handleError(res, error));
                 break;
             case "blogCity":
                 User.findByIdAndUpdate(userId, { $set: { "blogData.blogCity": data } })
-                    .then(() => res.status(200).json("Field Updated"))
-                    .catch((error) => handleError(res, error));
+                    .then(() => res.status(200).json({ message: "Поле успешно изменено" }))
+                    .catch((error) =>
+                        res.status(500).json("Не удалось изменить поле. Ошибка сервера")
+                    );
                 break;
             default:
         }

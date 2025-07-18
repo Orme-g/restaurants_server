@@ -98,7 +98,7 @@ const commentEvaluation = async (req, res) => {
             );
         });
         // Ответы res.status().json() только вне тела транзакций, чтобы не нарушать логику работы транзакций
-        res.status(200).json(type === "liked" ? "Liked" : "Disliked");
+        res.status(200).json({ message: type === "liked" ? "Liked" : "Disliked" });
     } catch (err) {
         handleError(res, err);
     } finally {
