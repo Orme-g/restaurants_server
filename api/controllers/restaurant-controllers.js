@@ -66,7 +66,6 @@ const getSortedRestaurants = (req, res) => {
 
 const findRestaurant = (req, res) => {
     try {
-        console.log(req.body);
         const { subway, cousine, sortBy } = req.body;
         const sort = sortBy === "expensive" ? -1 : 1;
         Restaurant.find({ cousine: { $in: cousine }, subway: { $in: [subway] } })
@@ -134,7 +133,7 @@ const storage = multer.diskStorage({
 const upload = multer({
     storage,
     limits: {
-        fileSize: 10 * 1024 * 1024,
+        fileSize: 5 * 1024 * 1024,
         files: 12,
     },
 });

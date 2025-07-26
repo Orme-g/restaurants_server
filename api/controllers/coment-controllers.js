@@ -37,6 +37,7 @@ const postComment = async (req, res) => {
         if (!userId) {
             return res.status(400).json("User id not provided!");
         }
+        comment.userId = userId;
         await session.withTransaction(async () => {
             await comment.save({ session });
             await User.findByIdAndUpdate(
