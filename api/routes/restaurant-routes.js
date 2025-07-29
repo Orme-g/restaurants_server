@@ -1,5 +1,6 @@
 const express = require("express");
-const { authMiddleware } = require("../../middleware/middleware");
+const { authMiddleware } = require("../../middleware/authMiddleware");
+const { uploadImageMiddleware } = require("../../middleware/uploadImageMiddleware");
 
 const {
     getLastAddedRestaurants,
@@ -8,7 +9,7 @@ const {
     getSortedRestaurants,
     findRestaurant,
     searchRestaurant,
-    upload,
+    // upload,
     getRestaurantReviews,
     postRestaurantReview,
     addAdditionalReview,
@@ -18,7 +19,12 @@ const router = express.Router();
 
 router.get("/restaurants/getLastAddedRestaurants", getLastAddedRestaurants);
 router.get("/restaurants/:id", getRestaurantById);
-router.post("/restaurants/addNewRestaurant", upload.array("images", 12), addNewRestaurant);
+// router.post("/restaurants/addNewRestaurant", upload.array("images", 12), addNewRestaurant);
+router.post(
+    "/restaurants/addNewRestaurant",
+    uploadImageMiddleware.array("images", 12),
+    addNewRestaurant
+);
 router.get("/sorted-restaurants/:sort", getSortedRestaurants);
 router.post("/find-restaurant/selection", findRestaurant);
 router.get("/search-restaurant/:input", searchRestaurant);

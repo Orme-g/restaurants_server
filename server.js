@@ -1,23 +1,17 @@
 const cors = require("cors");
 const express = require("express");
 const cookieParser = require("cookie-parser");
-// const https = require("https");  //HTTPS Server
-// const fs = require("fs");
-// const path = require("path");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-// const multer = require("multer");
-// const slugify = require("slugify");
-// const { v4: uuidv4 } = require("uuid");
 
 const restaurantRoutes = require("./api/routes/restaurant-routes");
 const donerRoutes = require("./api/routes/doner-routes");
 const commentRoutes = require("./api/routes/comment-routes");
-// const reviewRoutes = require("./api/routes/review-routes");
 const userRoutes = require("./api/routes/user-routes");
 const authRoutes = require("./api/routes/auth-routes");
 const eventRoutes = require("./api/routes/event-routes");
 const blogRoutes = require("./api/routes/blog-routes");
+const systemRoutes = require("./api/routes/system-routes");
 
 const PORT = 4000; // For Local development
 // const PORT = 5500; // For NAS/Web
@@ -32,8 +26,8 @@ app.use(
     cors({
         // origin: ["https://weats.ru", "http://weats.ru"], // Web Server
         // origin: "https://192.168.31.198:7000", // For NAS
-        origin: "http://localhost:5173", // Local development server
-        // origin: "http://localhost:4173", // Local production server
+        // origin: "http://localhost:5173", // Local development server
+        origin: "http://localhost:4173", // Local production server
         // methods: ["GET", "POST"]       // Какие запросы разрешены
         credentials: true,
     })
@@ -48,10 +42,11 @@ app.use(userRoutes);
 app.use(authRoutes);
 app.use(eventRoutes);
 app.use(blogRoutes);
+app.use(systemRoutes);
 //Getting images
-app.use("/images", express.static("/weats")); // For website
+// app.use("/images", express.static("/weats")); // For website
+app.use("/images", express.static("/weats", { redirect: false })); // Test
 // app.use("/images", express.static("/Users/ila/static")); // Local
-
 // To use HTTPS Protocol on Server
 // const sslServer = https.createServer(
 //     {

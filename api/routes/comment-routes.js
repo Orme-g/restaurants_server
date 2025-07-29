@@ -1,5 +1,5 @@
 const express = require("express");
-const { authMiddleware } = require("../../middleware/middleware");
+const { authMiddleware } = require("../../middleware/authMiddleware");
 const {
     getCommentsForTopic,
     getSingleCommentData,
