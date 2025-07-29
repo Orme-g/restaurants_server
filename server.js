@@ -13,8 +13,8 @@ const eventRoutes = require("./api/routes/event-routes");
 const blogRoutes = require("./api/routes/blog-routes");
 const systemRoutes = require("./api/routes/system-routes");
 
-const PORT = 4000; // For Local development
-// const PORT = 5500; // For NAS/Web
+// const PORT = 4000; // For Local development
+const PORT = 5500; // For NAS/Web
 
 // const URL = "mongodb://localhost:27017/restaurants_db";  // Local database
 // const URL = "mongodb://192.168.31.198:27017/restaurants_db"; // NAS Database
@@ -24,10 +24,10 @@ const app = express();
 app.use(cookieParser());
 app.use(
     cors({
-        // origin: ["https://weats.ru", "http://weats.ru"], // Web Server
+        origin: ["https://weats.ru", "http://weats.ru"], // Web Server
         // origin: "https://192.168.31.198:7000", // For NAS
         // origin: "http://localhost:5173", // Local development server
-        origin: "http://localhost:4173", // Local production server
+        // origin: "http://localhost:4173", // Local production server
         // methods: ["GET", "POST"]       // Какие запросы разрешены
         credentials: true,
     })
