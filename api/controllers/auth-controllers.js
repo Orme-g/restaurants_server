@@ -1,7 +1,11 @@
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { secret } = require("../../config");
+const secret =
+    process.env.JWT_SECRET ??
+    (() => {
+        throw new Error("JWT_SECRET key is not provided");
+    });
 
 const handleError = (res, error) => {
     res.status(500).json(error);
@@ -25,7 +29,7 @@ const registration = async (req, res) => {
         if (newUser) {
             return res.status(400).json("Пользователь с таким именем уже существует");
         }
-        const hashPassword = bcrypt.hashSync(password, 7);
+        const hashPassword = bcrypt.hashSync(password, 10);
         const user = new User({ ...req.body, password: hashPassword });
         user.save()
             .then(res.status(200).json({ message: "Регистрация прошла успешно" }))

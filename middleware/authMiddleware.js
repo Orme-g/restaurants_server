@@ -1,5 +1,9 @@
 const jwt = require("jsonwebtoken");
-const { secret } = require("../config");
+const secret =
+    process.env.JWT_SECRET ??
+    (() => {
+        throw new Error("JWT_SECRET key is not provided");
+    });
 
 const authMiddleware = (req, res, next) => {
     const token = req.cookies.accessToken;

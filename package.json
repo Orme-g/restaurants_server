@@ -25,6 +25,7 @@
         ]
     },
     "devDependencies": {
+        "dotenv": "^17.2.1",
         "nodemon": "^3.0.1"
     },
     "description": "Pet project.",

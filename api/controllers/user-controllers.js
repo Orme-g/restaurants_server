@@ -57,7 +57,7 @@ const changePassword = async (req, res) => {
         if (!checkPassword) {
             return res.status(400).json("Неверный пароль");
         }
-        const hashPassword = bcrypt.hashSync(newPass, 7);
+        const hashPassword = bcrypt.hashSync(newPass, 10);
         User.findByIdAndUpdate(userId, { $set: { password: hashPassword } })
             .then(() => res.status(200).json({ message: "Пароль успешно изменён" }))
             .catch((err) => res.status(500).json({ err }));

@@ -23,8 +23,9 @@ yarn-error.log*
 # docker containers
 *.tar
 
-# Security Certificates
+# Security 
 /certificate
+.env
 
 #Custom
 $_*
