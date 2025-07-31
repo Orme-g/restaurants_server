@@ -1,5 +1,6 @@
 const express = require("express");
 const { authMiddleware } = require("../../middleware/authMiddleware");
+const { rateLimitMiddleware } = require("../../middleware/rateLimitMiddleware");
 
 const {
     me,
@@ -17,7 +18,7 @@ const {
 const router = express.Router();
 router.get("/auth/me", authMiddleware, me);
 router.post("/auth/register", registration);
-router.post("/auth/login", login);
+router.post("/auth/login", rateLimitMiddleware, login);
 router.post("/auth/refresh", refresh);
 router.post("/auth/cookie-make", cookieMake);
 router.get("/auth/cookie-check", cookieCheck);

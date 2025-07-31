@@ -1,4 +1,4 @@
-// require("dotenv").config();
+// require("dotenv").config(); // Remove for prod!
 const cors = require("cors");
 const express = require("express");
 const cookieParser = require("cookie-parser");
@@ -13,7 +13,6 @@ const authRoutes = require("./api/routes/auth-routes");
 const eventRoutes = require("./api/routes/event-routes");
 const blogRoutes = require("./api/routes/blog-routes");
 const systemRoutes = require("./api/routes/system-routes");
-
 // const PORT = 4000; // For Local development
 const PORT = 5500; // For NAS/Web
 
